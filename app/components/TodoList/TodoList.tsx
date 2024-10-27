@@ -53,7 +53,8 @@ const TodoList: React.FC<TodoListProps> = ({
             placeholder="请输入新增的任务信息"
             value={newTaskDescription}
             onChange={(e) => setNewTaskDescription(e.target.value)}
-            className="flex-grow mr-2"
+            className="flex-grow"
+            style={{ marginRight: '10px' }}
           />
           <Button type="primary" onClick={handleAddTask} className="mr-2">
             确认
@@ -66,16 +67,21 @@ const TodoList: React.FC<TodoListProps> = ({
         renderItem={(task) => (
           <List.Item
             actions={[
-              <Button className="pb-4" type="link" onClick={() => onDeleteTask(task.id)}>
+              <Button
+                key="delete"
+                className="pb-4"
+                type="link"
+                onClick={() => onDeleteTask(task.id)}
+              >
                 删除
               </Button>
             ]}
-            className="border rounded mb-4 p-4 flex"
+            className="border rounded mb-4 p-4 flex items-center"
           >
             <Checkbox
+              style={{ marginRight: '10px', marginLeft: '10px' }}
               checked={task.status === 'done'}
               onChange={() => onUpdateTaskStatus(task.id, task.status === 'done' ? 'todo' : 'done')}
-              className="mr-2 ml-4"
             />
             {task.description}
           </List.Item>
