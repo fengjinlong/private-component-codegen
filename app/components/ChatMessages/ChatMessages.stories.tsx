@@ -15,18 +15,17 @@ const mockMessages: Array<Message> = [
   {
     id: '1',
     role: 'user',
-    content: 'Hello, how can I help you today?'
+    content: 'Hello, you can help me with code generation.'
   },
   {
     id: '2',
     role: 'assistant',
-    content: 'I can help you with programming questions and code generation.'
+    content: 'yes, I can help you with that. What do you need? '
   }
 ];
 
 export const Default: Story = {
   args: {
-    visible: true,
     messages: mockMessages,
     input: '',
     handleInputChange: (e) => console.log('Input changed:', e.target.value),
@@ -60,8 +59,7 @@ export const WithImage: Story = {
 
 export const Hidden: Story = {
   args: {
-    ...Default.args,
-    visible: false
+    ...Default.args
   }
 };
 

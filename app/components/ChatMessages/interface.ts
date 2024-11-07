@@ -1,7 +1,6 @@
 import { Message } from 'ai';
 
 interface ChatMessagesProps {
-  visible: boolean;
   messages: Array<Message>;
   input: string;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;

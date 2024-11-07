@@ -6,7 +6,7 @@ import React, {
   useMemo,
   ChangeEvent
 } from 'react';
-import { Modal, Image } from 'antd';
+import { Image } from 'antd';
 import { ChatInput } from '../ChatInput';
 import { TldrawEdit } from '../TldrawEdit';
 import { ChatMessagesProps } from './interface';
@@ -21,13 +21,11 @@ import UserMessage from './UserMessage';
 const ChatMessages = forwardRef<{ scrollToBottom: () => void }, ChatMessagesProps>(
   (
     {
-      visible,
       messages,
       input,
       handleInputChange,
       onSubmit,
       addToolResult,
-      onCancel,
       isLoading,
       messageImgUrl,
       setMessagesImgUrl
@@ -70,118 +68,108 @@ const ChatMessages = forwardRef<{ scrollToBottom: () => void }, ChatMessagesProp
     }, [messages]);
 
     return (
-      <Modal
-        title="Chat Messages"
-        open={visible}
-        onCancel={onCancel}
-        width={800}
-        style={{ top: 50 }}
-        maskClosable={false}
-        footer={null}
-      >
-        <div className={className}>
-          <div className="flex flex-col rounded-md h-80vh">
-            <div
-              ref={scrollContainerRef}
-              className="flex-1 overflow-y-auto rounded-xl p-4 text-sm leading-6 sm:leading-7"
-            >
-              {messages?.map((message, index) => {
-                return (
-                  <React.Fragment key={message.id}>
-                    {message.role === 'user' ? (
-                      <UserMessage message={message.content} />
-                    ) : (
-                      <React.Fragment>
-                        {!isEmpty(message.content) && (
-                          <AssistantMessage
-                            message={message.content}
-                            isLoading={isLoading && index === messages.length - 1}
-                          />
-                        )}
-                        {!isEmpty(message.toolInvocations) && (
-                          <AssistantMessage
-                            message={message.toolInvocations?.map(
-                              (toolInvocation: ToolInvocation) => {
-                                const toolCallId = toolInvocation.toolCallId;
+      <div className={className}>
+        <div className="flex flex-col rounded-md h-full">
+          <div
+            ref={scrollContainerRef}
+            className="flex-1 overflow-y-auto rounded-xl text-sm leading-6 sm:leading-7"
+          >
+            {messages?.map((message, index) => {
+              return (
+                <React.Fragment key={message.id}>
+                  {message.role === 'user' ? (
+                    <UserMessage message={message.content} />
+                  ) : (
+                    <React.Fragment>
+                      {!isEmpty(message.content) && (
+                        <AssistantMessage
+                          message={message.content}
+                          isLoading={isLoading && index === messages.length - 1}
+                        />
+                      )}
+                      {!isEmpty(message.toolInvocations) && (
+                        <AssistantMessage
+                          message={message.toolInvocations?.map(
+                            (toolInvocation: ToolInvocation) => {
+                              const toolCallId = toolInvocation.toolCallId;
 
-                                if (toolInvocation.toolName === 'askForConfirmation') {
-                                  return (
-                                    <div key={toolCallId}>
-                                      {toolInvocation.args.message}
-                                      <div>
-                                        {'result' in toolInvocation ? (
-                                          <b>{toolInvocation.result}</b>
-                                        ) : (
-                                          <ConfirmCodegen
-                                            onNoClick={() =>
-                                              addToolResult({
-                                                toolCallId,
-                                                result: 'No, denied'
-                                              })
-                                            }
-                                            onYesClick={() =>
-                                              addToolResult({
-                                                toolCallId,
-                                                result: 'Yes, confirmed.'
-                                              })
-                                            }
-                                          />
-                                        )}
-                                      </div>
-                                    </div>
-                                  );
-                                }
-
-                                return 'result' in toolInvocation ? (
+                              if (toolInvocation.toolName === 'askForConfirmation') {
+                                return (
                                   <div key={toolCallId}>
-                                    Tool call {`${toolInvocation.toolName}: `}
-                                    {toolInvocation.result}
+                                    {toolInvocation.args.message}
+                                    <div>
+                                      {'result' in toolInvocation ? (
+                                        <b>{toolInvocation.result}</b>
+                                      ) : (
+                                        <ConfirmCodegen
+                                          onNoClick={() =>
+                                            addToolResult({
+                                              toolCallId,
+                                              result: 'No, denied'
+                                            })
+                                          }
+                                          onYesClick={() =>
+                                            addToolResult({
+                                              toolCallId,
+                                              result: 'Yes, confirmed.'
+                                            })
+                                          }
+                                        />
+                                      )}
+                                    </div>
                                   </div>
-                                ) : (
-                                  <div key={toolCallId}>Calling {toolInvocation.toolName}...</div>
                                 );
                               }
-                            )}
-                            isLoading={isLoading && index === messages.length - 1}
-                          />
-                        )}
-                      </React.Fragment>
-                    )}
-                  </React.Fragment>
-                );
-              })}
-            </div>
-          </div>
-          <ChatInput
-            value={input}
-            handleInputChange={(e) =>
-              handleInputChange(e as unknown as ChangeEvent<HTMLInputElement>)
-            }
-            actions={useMemo(
-              () => [
-                <div className="flex items-center" key="draw a ui">
-                  <TldrawEdit key="draw a ui" onSubmit={setMessagesImgUrl} />
-                  {messageImgUrl && (
-                    <span className="ml-3 relative">
-                      <Image height={35} src={messageImgUrl} preview={true} />
-                      <CloseCircleOutlined
-                        className="absolute top-0 right-0 cursor-pointer bg-white rounded-full"
-                        onClick={() => setMessagesImgUrl('')}
-                      />
-                    </span>
+
+                              return 'result' in toolInvocation ? (
+                                <div key={toolCallId}>
+                                  Tool call {`${toolInvocation.toolName}: `}
+                                  {toolInvocation.result}
+                                </div>
+                              ) : (
+                                <div key={toolCallId}>Calling {toolInvocation.toolName}...</div>
+                              );
+                            }
+                          )}
+                          isLoading={isLoading && index === messages.length - 1}
+                        />
+                      )}
+                    </React.Fragment>
                   )}
-                </div>
-              ],
-              [messageImgUrl, setMessagesImgUrl]
-            )}
-            onSubmit={() => {
-              onSubmit(new Event('submit') as unknown as React.FormEvent<HTMLFormElement>);
-            }}
-            loading={isLoading}
-            minRows={1}
-          />
+                </React.Fragment>
+              );
+            })}
+          </div>
         </div>
-      </Modal>
+        <ChatInput
+          value={input}
+          handleInputChange={(e) =>
+            handleInputChange(e as unknown as ChangeEvent<HTMLInputElement>)
+          }
+          actions={useMemo(
+            () => [
+              <div className="flex items-center" key="draw a ui">
+                <TldrawEdit key="draw a ui" onSubmit={setMessagesImgUrl} />
+                {messageImgUrl && (
+                  <div className="ml-3 relative">
+                    <Image height={35} src={messageImgUrl} preview={true} />
+                    <CloseCircleOutlined
+                      className="absolute size-3 top-[-6px] right-[-6px] cursor-pointer text-gray-500 rounded-full"
+                      onClick={() => setMessagesImgUrl('')}
+                    />
+                  </div>
+                )}
+              </div>
+            ],
+            [messageImgUrl, setMessagesImgUrl]
+          )}
+          onSubmit={() => {
+            onSubmit(new Event('submit') as unknown as React.FormEvent<HTMLFormElement>);
+          }}
+          loading={isLoading}
+          minRows={1}
+        />
+      </div>
     );
   }
 );

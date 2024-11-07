@@ -46,7 +46,9 @@ const ChatInput: React.FC<ChatInputProps> = memo(
           </div>
           <Button
             loading={loading}
-            className={`generate-btn ${loading && 'animate-bounce'}`}
+            className={`generate-btn ${
+              loading && 'animate-bounce'
+            } bg-gradient-to-r from-indigo-500 to-purple-500`}
             type="primary"
             shape="circle"
             size="large"

@@ -11,10 +11,12 @@ interface AssistantMessageProps {
 const AssistantMessage: React.FC<AssistantMessageProps> = memo(
   ({ message, isLoading }) => {
     return (
-      <div className="mb-4 flex rounded-xl bg-slate-50 px-2 py-6 sm:px-4">
-        <Avatar>Bot</Avatar>
+      <div className="flex mb-4 rounded-xl px-2 py-6 gap-2">
+        <Avatar className="bg-indigo-500" size={32}>
+          Bot
+        </Avatar>
 
-        <div className="flex items-center rounded-xl overflow-auto">
+        <div className="flex flex-1 items-center rounded-xl overflow-auto">
           {typeof message === 'string' ? (
             <div className="w-full">
               <Markdown source={message} isChatting={isLoading} isStream></Markdown>

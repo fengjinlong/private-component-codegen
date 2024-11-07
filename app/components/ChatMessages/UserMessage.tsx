@@ -19,9 +19,11 @@ const UserMessage: React.FC<UserMessageProps> = memo(
   ({ message }) => {
     console.log('userMessage render....');
     return (
-      <div className="flex flex-row px-2 py-4 mb-4 sm:px-4">
-        <Avatar>User</Avatar>
-        <div className="">
+      <div className="flex flex-row px-2 py-4 mb-4 gap-2">
+        <Avatar className="bg-purple-500" size={32}>
+          User
+        </Avatar>
+        <div className="flex flex-1">
           {typeof message === 'string' ? (
             <Markdown source={message}></Markdown>
           ) : isArray(message) ? (

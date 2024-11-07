@@ -31,7 +31,14 @@ export const useClassName = ({
         transition: '0.3s',
         paddingRight: '50px',
         paddingTop: notActions ? '10px' : '45px',
-        paddingBottom: '10px'
+        paddingBottom: '10px',
+        '&:hover': {
+          borderColor: '#d9d9d9'
+        },
+        '&:focus': {
+          borderColor: '#d9d9d9',
+          boxShadow: '0 0 0 2px transparent'
+        }
       },
       '.generate-btn': {
         position: 'absolute',
