@@ -16,7 +16,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'ai-friendly-clean-business-component-template',
+  title: 'FigAgent',
   description: 'AI友好的整洁业务组件模板'
 };
 
