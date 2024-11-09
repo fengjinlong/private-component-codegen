@@ -7,6 +7,7 @@ import { Default as ChatMessagesDefault } from '../ChatMessages/ChatMessages.sto
 const meta: Meta<typeof ChatMainLayout> = {
   title: 'Components/ChatMainLayout',
   component: ChatMainLayout,
+  tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen'
   }

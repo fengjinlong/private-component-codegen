@@ -4,7 +4,8 @@ import InteractiveTagList from './InteractiveTagList';
 
 export default {
   title: 'Components/InteractiveTagList',
-  component: InteractiveTagList
+  component: InteractiveTagList,
+  tags: ['autodocs']
 } as Meta<typeof InteractiveTagList>;
 
 const Template: StoryFn<typeof InteractiveTagList> = (args) => <InteractiveTagList {...args} />;

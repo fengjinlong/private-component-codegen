@@ -290,7 +290,7 @@ const CodeLight = ({
   inline,
   match
 }: {
-  children: React.ReactNode & React.ReactNode[];
+  children: React.ReactNode;
   className?: string;
   inline?: boolean;
   match: RegExpExecArray | null;

@@ -7,30 +7,14 @@ import RemarkGfm from 'remark-gfm';
 import dynamic from 'next/dynamic';
 import { useClassName } from './styles';
 import { isEqual } from 'lodash';
+import { MarkdownProps, CodeProps, MarkdownComponents, ParagraphProps } from './interface';
 
 const CodeLight = dynamic(() => import('./CodeLight'));
-
-export enum CodeClassName {
-  guide = 'guide',
-  questionGuide = 'questionGuide',
-  mermaid = 'mermaid',
-  echarts = 'echarts',
-  quote = 'quote',
-  img = 'img'
-}
 
 const CHUNK_SIZE = 2; // 每次渲染的字符数
 const RENDER_INTERVAL = 0.5; // 渲染间隔(ms)
 
-const Markdown = ({
-  source,
-  isChatting = false,
-  isStream = false
-}: {
-  source: string;
-  isChatting?: boolean;
-  isStream?: boolean;
-}) => {
+const Markdown = ({ source, isChatting = false, isStream = false }: MarkdownProps) => {
   const className = useClassName();
   const [visibleContent, setVisibleContent] = useState('');
   const currentPositionRef = useRef(0);
@@ -81,11 +65,26 @@ const Markdown = ({
     };
   }, [source, isChatting, isStream]);
 
-  const components = useMemo<any>(
+  const components = useMemo<MarkdownComponents>(
     () => ({
       pre: 'div',
-      p: (pProps: any) => <p {...pProps} dir="auto" />,
-      code: Code
+      p: (pProps: ParagraphProps) => <p {...pProps} dir="auto" />,
+      code: (props: CodeProps) => <Code {...props} />,
+      ul: ({ children, ...props }: ParagraphProps) => (
+        <ul {...props} style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+          {children}
+        </ul>
+      ),
+      ol: ({ children, ...props }: ParagraphProps) => (
+        <ol {...props} style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+          {children}
+        </ol>
+      ),
+      li: ({ children, ...props }: ParagraphProps) => (
+        <li {...props} style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+          {children}
+        </li>
+      )
     }),
     []
   );
@@ -110,8 +109,8 @@ const Markdown = ({
 export default memo(Markdown);
 
 const Code = memo(
-  function Code(e: any) {
-    const { inline, className, children } = e;
+  function Code(props: CodeProps) {
+    const { inline, className, children } = props;
 
     const match = useMemo(() => /language-(\w+)/.exec(className || ''), [className]);
 

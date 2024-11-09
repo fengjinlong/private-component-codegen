@@ -123,7 +123,8 @@ export const useClassName = () => {
         display: 'inline-block'
       },
       '.markdown ul,.markdown ol': {
-        paddingLeft: '2em'
+        paddingLeft: '2em',
+        color: 'rgba(255, 255, 255, 0.8)'
       },
       '.markdown ul.no-list,.markdown ol.no-list': {
         listStyleType: 'none',
@@ -268,8 +269,8 @@ export const useClassName = () => {
         textAlign: 'right'
       },
       '.markdown code,.markdown tt': {
-        border: '1px solid #dee0e2',
-        backgroundColor: '#f4f6f8',
+        border: '1px solid #333',
+        backgroundColor: '#1e1e1e',
         borderRadius: '3px',
         margin: '0 2px',
         padding: '0 5px'
@@ -299,6 +300,7 @@ export const useClassName = () => {
         tabSize: '4',
         wordSpacing: 'normal',
         width: '100%',
+        color: 'rgba(255, 255, 255, 0.8)',
 
         '*': {
           wordBreak: 'break-word'
@@ -310,33 +312,33 @@ export const useClassName = () => {
           padding: '15px',
           margin: 0,
           border: 'none',
-          borderRadius: 0,
-          backgroundColor: '#292b33 !important',
+          borderRadius: '6px',
+          backgroundColor: '#1e1e1e !important',
           overflowX: 'auto',
           color: '#fff'
         },
 
         'pre code': {
-          backgroundColor: '#292b33 !important',
+          backgroundColor: '#1e1e1e !important',
           width: '100%'
         },
 
         a: {
           textDecoration: 'underline',
-          color: 'var(--chakra-colors-primary-700)'
+          color: 'var(--chakra-colors-blue-400)'
         },
 
         table: {
           borderCollapse: 'separate',
           borderSpacing: 0,
-          color: 'var(--chakra-colors-gray-700)',
+          color: 'rgba(255, 255, 255, 0.8)',
 
           'thead tr:first-child th': {
             borderBottomWidth: '1px',
             borderLeftWidth: '1px',
             borderTopWidth: '1px',
-            borderColor: '#ccc',
-            backgroundColor: 'rgba(236, 236, 241, 0.2)',
+            borderColor: '#333',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
             overflow: 'hidden',
 
             '&:first-child': {
@@ -351,7 +353,7 @@ export const useClassName = () => {
           td: {
             borderBottomWidth: '1px',
             borderLeftWidth: '1px',
-            borderColor: '#ccc',
+            borderColor: '#333',
 
             '&:last-of-type': {
               borderRightWidth: '1px'
@@ -367,6 +369,43 @@ export const useClassName = () => {
               '&:last-child': {
                 borderBottomRightRadius: '0.375rem'
               }
+            }
+          }
+        },
+
+        blockquote: {
+          borderLeft: '4px solid #444',
+          color: '#999',
+          padding: '0 15px'
+        },
+
+        'table tr': {
+          backgroundColor: '#1a1a1a'
+        },
+        'table tr:nth-child(2n)': {
+          backgroundColor: '#242424'
+        },
+
+        ul: {
+          listStyle: 'disc outside',
+          paddingLeft: '2em',
+          '& li': {
+            display: 'list-item',
+            color: 'rgba(255, 255, 255, 0.6)',
+            '& > *': {
+              color: 'rgba(255, 255, 255, 0.6)'
+            }
+          }
+        },
+
+        ol: {
+          listStyle: 'decimal outside',
+          paddingLeft: '17px',
+          '& li': {
+            display: 'list-item',
+            color: 'rgba(255, 255, 255, 0.6)',
+            '& > *': {
+              color: 'rgba(255, 255, 255, 0.6)'
             }
           }
         }

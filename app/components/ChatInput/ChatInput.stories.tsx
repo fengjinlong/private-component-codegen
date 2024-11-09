@@ -7,7 +7,8 @@ import ChatInput from './ChatInput';
 
 export default {
   title: 'Components/ChatInput',
-  component: ChatInput
+  component: ChatInput,
+  tags: ['autodocs']
 } as Meta<typeof ChatInput>;
 
 const Template: StoryFn<typeof ChatInput> = () => {
