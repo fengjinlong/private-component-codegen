@@ -7,13 +7,13 @@ export const useClassName = ({
   loading: boolean;
   notActions: boolean;
 }) => {
-  const className = useEmotionCss(({ token }) => {
+  const className = useEmotionCss(() => {
     return {
       position: 'relative',
       width: '100%',
       background: loading
         ? 'repeating-linear-gradient(101.79deg, rgb(255, 0, 0) 0%, rgb(128, 0, 128) 33%, rgb(0, 0, 255) 66%, rgb(0, 128, 0) 100%) 0% 0% / 200% 200%'
-        : 'transparent',
+        : '#1f1f1f',
       animation: `${loading ? 'gradient' : ''} 6s linear infinite`,
       backgroundSize: '200%, 200%',
       borderRadius: '8px',
@@ -32,12 +32,20 @@ export const useClassName = ({
         paddingRight: '50px',
         paddingTop: notActions ? '10px' : '45px',
         paddingBottom: '10px',
+        background: '#2b2b2b',
+        color: '#e0e0e0',
+        border: '1px solid #383838',
+        '&::placeholder': {
+          color: '#666666'
+        },
         '&:hover': {
-          borderColor: '#d9d9d9'
+          borderColor: '#505050',
+          background: '#333333'
         },
         '&:focus': {
-          borderColor: '#d9d9d9',
-          boxShadow: '0 0 0 2px transparent'
+          borderColor: '#606060',
+          background: '#333333',
+          boxShadow: '0 0 0 2px rgba(255, 255, 255, 0.1)'
         }
       },
       '.generate-btn': {
@@ -52,8 +60,7 @@ export const useClassName = ({
         left: '12px',
         right: '12px',
         display: notActions ? 'none' : 'flex',
-        alignItems: 'center',
-        background: token.colorBgBase
+        alignItems: 'center'
       },
       '.image-wrapper': {
         marginTop: '5px'

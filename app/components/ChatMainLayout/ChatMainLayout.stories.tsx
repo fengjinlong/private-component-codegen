@@ -1,37 +1,35 @@
-import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { useState } from 'react';
 import ChatMainLayout from './ChatMainLayout';
+import { ChatMessages, ChatMessagesProps } from '../ChatMessages';
+import { Default as ChatMessagesDefault } from '../ChatMessages/ChatMessages.stories';
 
 const meta: Meta<typeof ChatMainLayout> = {
+  title: 'Components/ChatMainLayout',
   component: ChatMainLayout,
-  title: 'Layout/ChatMainLayout'
+  parameters: {
+    layout: 'fullscreen'
+  }
 };
 
 export default meta;
-
 type Story = StoryObj<typeof ChatMainLayout>;
 
-export const Default: Story = {
-  args: {
-    dropdownContent: (
-      <>
-        <p>Menu item 1</p>
-        <p>Menu item 2</p>
-      </>
-    ),
-    mainContent: <div>Main content goes here</div>
-  }
+// 创建一个包装组件来处理状态
+const ChatMainLayoutWithState = () => {
+  const [selectedModel, setSelectedModel] = useState('OpenAI SDK');
+
+  return (
+    <ChatMainLayout
+      mainContent={
+        <ChatMessages {...(ChatMessagesDefault.args as ChatMessagesProps)} isLoading={true} />
+      }
+      selectedModel={selectedModel}
+      onModelChange={setSelectedModel}
+    />
+  );
 };
 
-export const CustomDropdown: Story = {
-  args: {
-    dropdownContent: (
-      <>
-        <p>Custom item 1</p>
-        <p>Custom item 2</p>
-        <p>Custom item 3</p>
-      </>
-    ),
-    mainContent: <div>Custom main content</div>
-  }
+export const Default: Story = {
+  render: () => <ChatMainLayoutWithState />
 };

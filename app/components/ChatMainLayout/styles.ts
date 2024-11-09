@@ -6,7 +6,7 @@ export const useStyles = () => {
       backgroundColor: '#242424 !important'
     },
     '.ant-dropdown-menu-item': {
-      color: '#fff !important',
+      color: '#e6e6e6 !important',
       '&:hover': {
         backgroundColor: '#333 !important'
       }

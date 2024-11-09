@@ -10,7 +10,6 @@ import { Image } from 'antd';
 import { ChatInput } from '../ChatInput';
 import { TldrawEdit } from '../TldrawEdit';
 import { ChatMessagesProps } from './interface';
-import { useClassName } from './styles';
 import { ToolInvocation } from 'ai';
 import { isEmpty } from 'lodash';
 import ConfirmCodegen from './ConfirmCodegen';
@@ -32,7 +31,6 @@ const ChatMessages = forwardRef<{ scrollToBottom: () => void }, ChatMessagesProp
     },
     ref
   ) => {
-    const className = useClassName();
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     useImperativeHandle(ref, () => ({
@@ -68,8 +66,8 @@ const ChatMessages = forwardRef<{ scrollToBottom: () => void }, ChatMessagesProp
     }, [messages]);
 
     return (
-      <div className={className}>
-        <div className="flex flex-col rounded-md h-full">
+      <div className="relative pb-28">
+        <div className="flex flex-col rounded-md">
           <div
             ref={scrollContainerRef}
             className="flex-1 overflow-y-auto rounded-xl text-sm leading-6 sm:leading-7"
@@ -141,34 +139,38 @@ const ChatMessages = forwardRef<{ scrollToBottom: () => void }, ChatMessagesProp
             })}
           </div>
         </div>
-        <ChatInput
-          value={input}
-          handleInputChange={(e) =>
-            handleInputChange(e as unknown as ChangeEvent<HTMLInputElement>)
-          }
-          actions={useMemo(
-            () => [
-              <div className="flex items-center" key="draw a ui">
-                <TldrawEdit key="draw a ui" onSubmit={setMessagesImgUrl} />
-                {messageImgUrl && (
-                  <div className="ml-3 relative">
-                    <Image height={35} src={messageImgUrl} preview={true} />
-                    <CloseCircleOutlined
-                      className="absolute size-3 top-[-6px] right-[-6px] cursor-pointer text-gray-500 rounded-full"
-                      onClick={() => setMessagesImgUrl('')}
-                    />
+        <div className="fixed flex justify-center left-0 bottom-0 w-full bg-gradient-to-b from-transparent to-inherit">
+          <div className="p-4 w-full max-w-[1058px]">
+            <ChatInput
+              value={input}
+              handleInputChange={(e) =>
+                handleInputChange(e as unknown as ChangeEvent<HTMLInputElement>)
+              }
+              actions={useMemo(
+                () => [
+                  <div className="flex items-center" key="draw a ui">
+                    <TldrawEdit key="draw a ui" onSubmit={setMessagesImgUrl} />
+                    {messageImgUrl && (
+                      <div className="ml-3 relative h-6">
+                        <Image className="!h-6 min-w-6" src={messageImgUrl} preview={true} />
+                        <CloseCircleOutlined
+                          className="absolute size-3 top-[-6px] right-[-6px] cursor-pointer text-white/80 rounded-full hover:text-red-500"
+                          onClick={() => setMessagesImgUrl('')}
+                        />
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            ],
-            [messageImgUrl, setMessagesImgUrl]
-          )}
-          onSubmit={() => {
-            onSubmit(new Event('submit') as unknown as React.FormEvent<HTMLFormElement>);
-          }}
-          loading={isLoading}
-          minRows={1}
-        />
+                ],
+                [messageImgUrl, setMessagesImgUrl]
+              )}
+              onSubmit={() => {
+                onSubmit(new Event('submit') as unknown as React.FormEvent<HTMLFormElement>);
+              }}
+              loading={isLoading}
+              minRows={1}
+            />
+          </div>
+        </div>
       </div>
     );
   }

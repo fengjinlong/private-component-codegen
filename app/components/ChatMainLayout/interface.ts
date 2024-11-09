@@ -1,8 +1,5 @@
-interface ChatMainLayoutProps {
-  /** Custom content for the dropdown menu */
-  dropdownContent?: React.ReactNode;
-  /** Content to be displayed in the main area */
-  mainContent?: React.ReactNode;
+export interface ChatMainLayoutProps {
+  mainContent: React.ReactNode;
+  selectedModel: string;
+  onModelChange: (model: string) => void;
 }
-
-export type { ChatMainLayoutProps };

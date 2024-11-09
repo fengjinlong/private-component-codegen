@@ -1,6 +1,7 @@
-import { useState, FC } from 'react';
+import { useState, FC, useRef } from 'react';
 import { Drawer, Button, Tooltip } from 'antd';
 import { PictureOutlined } from '@ant-design/icons';
+import { Editor, setUserPreferences } from '@tldraw/tldraw';
 import '@tldraw/tldraw/tldraw.css';
 import { getSvgAsImage } from './lib/getSvgAsImage';
 import { blobToBase64 } from './lib/blobToBase64';
@@ -8,9 +9,9 @@ import { TldrawEditProps } from './interface';
 import { useClassName } from './styles';
 
 const Tldraw = (await import('@tldraw/tldraw')).Tldraw;
-const useEditor = (await import('@tldraw/tldraw')).useEditor;
 
 const TldrawEdit: FC<TldrawEditProps> = ({ onSubmit }) => {
+  const editorRef = useRef<Editor>();
   const classNames = useClassName();
   const [visible, setVisible] = useState(false);
 
@@ -24,13 +25,25 @@ const TldrawEdit: FC<TldrawEditProps> = ({ onSubmit }) => {
 
   return (
     <>
-      <Tooltip key="Draw A Image" title="Draw A Image">
-        <Button size="small" onClick={showDrawer} icon={<PictureOutlined />} />
+      <Tooltip key="Draw UI" title="Draw UI">
+        <Button
+          className="!bg-white/20 border-none"
+          size="small"
+          onClick={showDrawer}
+          icon={<PictureOutlined className="text-white/60" />}
+        />
       </Tooltip>
       <Drawer
         title={
           <div className="flex justify-between items-center w-full">
             <span>Draw UI</span>
+            <ExportButton
+              editor={editorRef.current!}
+              onSubmit={(dataUrl) => {
+                onSubmit(dataUrl);
+                setVisible(false);
+              }}
+            />
           </div>
         }
         placement="right"
@@ -43,24 +56,29 @@ const TldrawEdit: FC<TldrawEditProps> = ({ onSubmit }) => {
         }}
       >
         <div className={`w-full h-full ${classNames}`}>
-          <Tldraw persistenceKey="tldraw">
-            <div className="fixed top-0 right-0 m-2">
-              <ExportButton
-                onSubmit={(dataUrl) => {
-                  onSubmit(dataUrl);
-                  setVisible(false);
-                }}
-              />
-            </div>
-          </Tldraw>
+          <Tldraw
+            onMount={(editor) => {
+              editorRef.current = editor;
+              setUserPreferences({
+                isDarkMode: true,
+                id: 'tldraw'
+              });
+            }}
+            persistenceKey="tldraw"
+          />
         </div>
       </Drawer>
     </>
   );
 };
 
-function ExportButton({ onSubmit }: { onSubmit: (dataUrl: string) => void }) {
-  const editor = useEditor();
+function ExportButton({
+  onSubmit,
+  editor
+}: {
+  onSubmit: (dataUrl: string) => void;
+  editor: Editor;
+}) {
   const [loading, setLoading] = useState(false);
   return (
     <Button
@@ -86,7 +104,7 @@ function ExportButton({ onSubmit }: { onSubmit: (dataUrl: string) => void }) {
           setLoading(false);
         }
       }}
-      className="ml-2"
+      className="!bg-gradient-to-r from-indigo-500 to-purple-500 !hover:opacity-20"
       loading={loading}
     >
       Confirm

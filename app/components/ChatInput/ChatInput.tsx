@@ -48,7 +48,7 @@ const ChatInput: React.FC<ChatInputProps> = memo(
             loading={loading}
             className={`generate-btn ${
               loading && 'animate-bounce'
-            } bg-gradient-to-r from-indigo-500 to-purple-500`}
+            } !bg-gradient-to-r from-indigo-500 to-purple-500 !hover:opacity-20`}
             type="primary"
             shape="circle"
             size="large"

@@ -95,6 +95,26 @@ export const WithLongConversation: Story = {
         role: 'assistant',
         content:
           'React Hooks are functions that allow you to use state and other React features in functional components...'
+      },
+      {
+        id: '7',
+        role: 'user',
+        content: 'Can you draw a UI for me?'
+      },
+      {
+        id: '8',
+        role: 'assistant',
+        content: 'Sure, I can help you with that.'
+      },
+      {
+        id: '9',
+        role: 'user',
+        content: 'Here is the UI I want.'
+      },
+      {
+        id: '10',
+        role: 'assistant',
+        content: 'Here is the UI you requested.'
       }
     ]
   }

@@ -1,15 +1,16 @@
 import { useEmotionCss } from '@ant-design/use-emotion-css';
 
 export const useClassName = () => {
-  const className = useEmotionCss(({ token }) => {
+  const className = useEmotionCss(() => {
     return {
+      color: 'rgba(255, 255, 255, 0.8)',
       '.waitingAnimation > :last-child::after': {
         display: 'inline-block',
         content: '""',
         width: '2px',
-        height: '18px',
+        height: '14px',
         transform: 'translate(4px, 2px) scaleY(1.3)',
-        backgroundColor: '#000',
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
         animation: 'blink 0.6s infinite'
       },
       '.waitingAnimation > pre:last-child::after': {
