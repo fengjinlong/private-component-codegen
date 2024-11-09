@@ -1,6 +1,9 @@
+'use client';
+
 import { useState, FC, useRef } from 'react';
 import { Drawer, Button, Tooltip } from 'antd';
 import { PictureOutlined } from '@ant-design/icons';
+import dynamic from 'next/dynamic';
 import { Editor, setUserPreferences } from '@tldraw/tldraw';
 import '@tldraw/tldraw/tldraw.css';
 import { getSvgAsImage } from './lib/getSvgAsImage';
@@ -8,7 +11,10 @@ import { blobToBase64 } from './lib/blobToBase64';
 import { TldrawEditProps } from './interface';
 import { useClassName } from './styles';
 
-const Tldraw = (await import('@tldraw/tldraw')).Tldraw;
+// 动态导入 Tldraw 组件
+const Tldraw = dynamic(() => import('@tldraw/tldraw').then((mod) => mod.Tldraw), {
+  ssr: false
+});
 
 const TldrawEdit: FC<TldrawEditProps> = ({ onSubmit }) => {
   const editorRef = useRef<Editor>();

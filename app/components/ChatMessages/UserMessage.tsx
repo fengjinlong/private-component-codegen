@@ -20,7 +20,7 @@ const UserMessage: React.FC<UserMessageProps> = memo(
     console.log('userMessage render....');
     return (
       <div className="flex flex-row px-2 py-4 mb-4 gap-2">
-        <Avatar className="bg-purple-500" size={32}>
+        <Avatar className="!bg-purple-500" size={32}>
           You
         </Avatar>
         <div className="flex flex-1">

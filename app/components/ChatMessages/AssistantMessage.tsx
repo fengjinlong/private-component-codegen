@@ -12,7 +12,7 @@ const AssistantMessage: React.FC<AssistantMessageProps> = memo(
   ({ message, isLoading }) => {
     return (
       <div className="flex mb-4 rounded-xl px-2 py-6 gap-2">
-        <Avatar className="bg-indigo-500" size={32}>
+        <Avatar className="!bg-indigo-500" size={32}>
           Bot
         </Avatar>
 
