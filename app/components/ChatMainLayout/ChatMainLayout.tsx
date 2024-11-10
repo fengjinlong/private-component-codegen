@@ -7,15 +7,10 @@ import { useStyles } from './styles';
 const ChatMainLayout: React.FC<ChatMainLayoutProps> = ({
   mainContent,
   selectedModel,
-  onModelChange
+  onModelChange,
+  modelItems
 }) => {
   const styles = useStyles();
-  const items = [
-    { label: 'OpenAI SDK', key: 'openai-sdk' },
-    { label: 'LangChain', key: 'langchain' },
-    { label: 'LLamaIndex', key: 'llamaindex' },
-    { label: 'Vercel AI SDK', key: 'vercel-ai-sdk' }
-  ];
 
   return (
     <div className="flex flex-col w-full h-screen bg-black/90 bg-gradient-to-br from-indigo-500/10 to-purple-500/30">
@@ -27,10 +22,10 @@ const ChatMainLayout: React.FC<ChatMainLayoutProps> = ({
         <Divider type="vertical" className="h-3 border-white/20" />
         <Dropdown
           menu={{
-            items,
+            items: modelItems,
             onClick: ({ key }) => {
-              const selectedItem = items.find((item) => item.key === key);
-              onModelChange(selectedItem?.label || 'OpenAI SDK');
+              const selectedItem = modelItems.find((item) => item.key === key);
+              onModelChange(selectedItem?.key || 'openai-sdk');
             }
           }}
           dropdownRender={(menu) => (
@@ -42,15 +37,15 @@ const ChatMainLayout: React.FC<ChatMainLayoutProps> = ({
           )}
         >
           <Button className="!bg-black/80 !text-white/80 !border-black/80">
-            {selectedModel} <DownOutlined />
+            {modelItems.find((item) => item.key === selectedModel)?.label} <DownOutlined />
           </Button>
         </Dropdown>
       </div>
-      <div className="flex justify-center items-center h-[calc(100%-57px)] overflow-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent">
-        <div className="w-full h-full p-4 max-w-[1058px] text-white/80">{mainContent}</div>
-      </div>
+      <div className="h-[calc(100%-57px)]">{mainContent}</div>
     </div>
   );
 };
+
+ChatMainLayout.displayName = 'ChatMainLayout';
 
 export default ChatMainLayout;

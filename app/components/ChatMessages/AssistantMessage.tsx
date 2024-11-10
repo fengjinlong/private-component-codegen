@@ -1,10 +1,10 @@
-import React, { ReactNode, memo } from 'react';
+import React, { memo } from 'react';
 import { Avatar } from 'antd';
 import { Markdown } from '../Markdown';
 import { isEqual } from 'lodash';
 
 interface AssistantMessageProps {
-  message: string | ReactNode;
+  message: string;
   isLoading: boolean;
 }
 

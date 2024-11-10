@@ -1,14 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import ChatMainLayout from './components/ChatMainLayout/ChatMainLayout';
 import { Skeleton } from 'antd';
 
-const ChatMessages = dynamic(() => import('./components/ChatMessages/ChatMessages'), {
+const OpenaiSdk = dynamic(() => import('./openai-sdk'), {
   ssr: false,
   loading: () => (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4 px-52 py-4">
       <Skeleton active />
       <Skeleton active />
       <Skeleton active />
@@ -16,61 +17,40 @@ const ChatMessages = dynamic(() => import('./components/ChatMessages/ChatMessage
   )
 });
 
+const modelItems = [
+  { label: 'OpenAI SDK', key: 'openai-sdk', component: <OpenaiSdk /> },
+  { label: 'LangChain', key: 'langchain' },
+  { label: 'LLamaIndex', key: 'llamaindex' },
+  { label: 'Vercel AI SDK', key: 'vercel-ai-sdk' }
+];
+
 const Home = () => {
-  const [input, setInput] = useState('');
-  const [messages, setMessages] = useState([
-    {
-      id: '1',
-      role: 'user',
-      content: 'Hello, how are you?'
-    },
-    {
-      id: '2',
-      role: 'assistant',
-      content: 'I am fine, thank you!'
-    }
-  ]);
-  const [messageImgUrl, setMessageImgUrl] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const typeFromUrl = searchParams.get('type');
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(e.target.value);
-  };
-
-  const handleSubmit = async () => {
-    setIsLoading(true);
-    // 处理提交逻辑
-    setIsLoading(false);
-  };
-
-  const handleCancel = () => {
-    setIsLoading(false);
-  };
+  const [selectedModel, setSelectedModel] = useState(
+    modelItems.some((item) => item.key === typeFromUrl) ? typeFromUrl! : modelItems[0].key
+  );
 
   const handleModelChange = (model: string) => {
-    // 处理模型变更逻辑
+    const params = new URLSearchParams(searchParams);
+    params.set('type', model);
+    router.push(`${pathname}?${params.toString()}`);
+    setSelectedModel(model);
   };
 
-  const handleToolResult = (result: any) => {
-    // 处理工具结果逻辑
-  };
+  const MainContent = useMemo(
+    () => modelItems.find((item) => item.key === selectedModel)?.component,
+    [selectedModel]
+  );
 
   return (
     <ChatMainLayout
-      mainContent={
-        <ChatMessages
-          messages={messages}
-          input={input}
-          handleInputChange={handleInputChange}
-          onSubmit={handleSubmit}
-          addToolResult={handleToolResult}
-          onCancel={handleCancel}
-          isLoading={isLoading}
-          messageImgUrl={messageImgUrl}
-          setMessagesImgUrl={setMessageImgUrl}
-        />
-      }
-      selectedModel="OpenAI SDK"
+      modelItems={modelItems}
+      mainContent={MainContent}
+      selectedModel={selectedModel}
       onModelChange={handleModelChange}
     />
   );

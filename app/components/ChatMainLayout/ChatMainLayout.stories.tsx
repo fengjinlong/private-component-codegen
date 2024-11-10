@@ -1,36 +1,46 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { useState } from 'react';
 import ChatMainLayout from './ChatMainLayout';
-import { ChatMessages, ChatMessagesProps } from '../ChatMessages';
-import { Default as ChatMessagesDefault } from '../ChatMessages/ChatMessages.stories';
 
-const meta: Meta<typeof ChatMainLayout> = {
+const meta = {
   title: 'Components/ChatMainLayout',
   component: ChatMainLayout,
-  tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen'
   }
-};
+} satisfies Meta<typeof ChatMainLayout>;
 
 export default meta;
 type Story = StoryObj<typeof ChatMainLayout>;
 
-// 创建一个包装组件来处理状态
-const ChatMainLayoutWithState = () => {
-  const [selectedModel, setSelectedModel] = useState('OpenAI SDK');
-
-  return (
-    <ChatMainLayout
-      mainContent={
-        <ChatMessages {...(ChatMessagesDefault.args as ChatMessagesProps)} isLoading={true} />
-      }
-      selectedModel={selectedModel}
-      onModelChange={setSelectedModel}
-    />
-  );
-};
+const modelItems = [
+  { label: 'OpenAI SDK', key: 'openai-sdk' },
+  { label: 'LangChain', key: 'langchain' },
+  { label: 'LLamaIndex', key: 'llamaindex' },
+  { label: 'Vercel AI SDK', key: 'vercel-ai-sdk' }
+];
 
 export const Default: Story = {
-  render: () => <ChatMainLayoutWithState />
+  args: {
+    mainContent: <div>Main Content</div>,
+    selectedModel: 'openai-sdk',
+    onModelChange: (model) => console.log('Model changed to:', model),
+    modelItems: modelItems
+  }
+};
+
+export const WithLongContent: Story = {
+  args: {
+    mainContent: (
+      <div>
+        {Array(20)
+          .fill(0)
+          .map((_, i) => (
+            <p key={i}>Long content line {i + 1}</p>
+          ))}
+      </div>
+    ),
+    selectedModel: 'langchain',
+    onModelChange: (model) => console.log('Model changed to:', model),
+    modelItems: modelItems
+  }
 };

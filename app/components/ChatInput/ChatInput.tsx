@@ -40,6 +40,7 @@ const ChatInput: React.FC<ChatInputProps> = memo(
             type="primary"
             shape="circle"
             size="large"
+            loading={loading}
             onClick={() => {
               if (!value) {
                 message.warning('Please input your message');

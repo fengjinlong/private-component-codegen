@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { ChatMessages } from './';
-import { Message } from 'ai';
+import { Message } from './interface';
 
 const meta = {
   title: 'Components/ChatMessages',
@@ -26,17 +26,17 @@ const mockMessages: Array<Message> = [
 
 export const Default: Story = {
   args: {
-    messages: mockMessages,
+    messages: mockMessages as Array<{
+      id: string;
+      role: 'user' | 'assistant' | 'tool';
+      content: string;
+    }>,
     input: '',
     handleInputChange: (e) => console.log('Input changed:', e.target.value),
     onSubmit: (e) => {
       e.preventDefault();
       console.log('Form submitted');
     },
-    addToolResult: ({ toolCallId, result }) => {
-      console.log('Tool result added:', { toolCallId, result });
-    },
-    onCancel: () => console.log('Cancelled'),
     isLoading: false,
     messageImgUrl: '',
     setMessagesImgUrl: (url) => console.log('Image URL set:', url)

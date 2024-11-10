@@ -400,7 +400,7 @@ export const useClassName = () => {
 
         ol: {
           listStyle: 'decimal outside',
-          paddingLeft: '17px',
+          paddingLeft: '2em',
           '& li': {
             display: 'list-item',
             color: 'rgba(255, 255, 255, 0.6)',
