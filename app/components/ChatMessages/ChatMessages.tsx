@@ -17,7 +17,8 @@ const ChatMessages = forwardRef<{ scrollToBottom: () => void }, ChatMessagesProp
     onSubmit,
     isLoading,
     messageImgUrl,
-    setMessagesImgUrl
+    setMessagesImgUrl,
+    onRetry
   }) => {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -42,6 +43,9 @@ const ChatMessages = forwardRef<{ scrollToBottom: () => void }, ChatMessagesProp
                             <AssistantMessage
                               message={message.content as string}
                               isLoading={isLoading && index === messages.length - 1}
+                              onRetry={() => {
+                                onRetry?.(message.id);
+                              }}
                             />
                           )}
                         </React.Fragment>

@@ -39,7 +39,8 @@ export const Default: Story = {
     },
     isLoading: false,
     messageImgUrl: '',
-    setMessagesImgUrl: (url) => console.log('Image URL set:', url)
+    setMessagesImgUrl: (url) => console.log('Image URL set:', url),
+    onRetry: (id) => console.log('Retry message with id:', id)
   }
 };
 

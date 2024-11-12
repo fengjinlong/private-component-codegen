@@ -2,7 +2,7 @@ import React from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { CopyOutlined } from '@ant-design/icons';
 import { Flex } from 'antd';
-import { useCopyData } from './helpers';
+import { useCopyData } from '@/lib/utils';
 import { useCodeLightClassName } from './styles';
 
 const codeLight: { [key: string]: React.CSSProperties } = {

@@ -20,6 +20,7 @@ interface ChatMessagesProps {
   isLoading: boolean;
   messageImgUrl: string;
   setMessagesImgUrl: (url: string) => void;
+  onRetry: (id: string) => void;
 }
 
 export type { ChatMessagesProps, Message, MessageContent };

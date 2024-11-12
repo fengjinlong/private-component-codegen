@@ -3,14 +3,17 @@ import { Avatar, Button, Badge } from 'antd';
 import { CopyOutlined, FileOutlined, RedoOutlined } from '@ant-design/icons';
 import { Markdown } from '../Markdown';
 import { isEqual } from 'lodash';
+import { useCopyData } from '@/lib/utils';
 
 interface AssistantMessageProps {
   message: string;
   isLoading: boolean;
+  onRetry?: () => void;
 }
 
 const AssistantMessage: React.FC<AssistantMessageProps> = memo(
-  ({ message, isLoading }) => {
+  ({ message, isLoading, onRetry }) => {
+    const { copyData } = useCopyData();
     return (
       <div className="flex mb-4 rounded-xl px-2 py-6 gap-2">
         <Avatar className="!bg-indigo-500" size={32}>
@@ -31,10 +34,17 @@ const AssistantMessage: React.FC<AssistantMessageProps> = memo(
                 RAG Docs
               </Button>
             </Badge>
-            <Button size="small" type="default" icon={<CopyOutlined />}>
+            <Button
+              onClick={() => {
+                copyData(message);
+              }}
+              size="small"
+              type="default"
+              icon={<CopyOutlined />}
+            >
               Copy
             </Button>
-            <Button size="small" type="default" icon={<RedoOutlined />}>
+            <Button size="small" type="default" icon={<RedoOutlined />} onClick={onRetry}>
               Retry
             </Button>
           </div>

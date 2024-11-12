@@ -16,16 +16,8 @@ const Home = () => {
     setInput(e.target.value);
   };
 
-  const handleSubmit = async () => {
+  const handleSendMessage = async (newMessages: Message[]) => {
     try {
-      const newMessages = [
-        ...messages,
-        {
-          id: nanoid(),
-          role: 'user',
-          content: input
-        }
-      ];
       setMessages(newMessages as Message[]);
 
       setIsLoading(true);
@@ -71,6 +63,25 @@ const Home = () => {
     }
   };
 
+  const handleSubmit = async () => {
+    await handleSendMessage([
+      ...messages,
+      {
+        id: nanoid(),
+        role: 'user',
+        content: input
+      }
+    ]);
+  };
+
+  const handleRetry = (id: string) => {
+    const index = messages.findIndex((message) => message.id === id);
+    if (index > 0) {
+      const previousMessages = messages.slice(0, index);
+      handleSendMessage(previousMessages);
+    }
+  };
+
   return (
     <ChatMessages
       messages={messages}
@@ -80,6 +91,7 @@ const Home = () => {
       isLoading={isLoading}
       messageImgUrl={messageImgUrl}
       setMessagesImgUrl={setMessageImgUrl}
+      onRetry={handleRetry}
     />
   );
 };
