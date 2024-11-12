@@ -391,9 +391,9 @@ export const useClassName = () => {
           paddingLeft: '2em',
           '& li': {
             display: 'list-item',
-            color: 'rgba(255, 255, 255, 0.6)',
+            color: 'rgba(255, 255, 255, 0.8)',
             '& > *': {
-              color: 'rgba(255, 255, 255, 0.6)'
+              color: 'rgba(255, 255, 255, 0.8)'
             }
           }
         },
@@ -403,9 +403,9 @@ export const useClassName = () => {
           paddingLeft: '2em',
           '& li': {
             display: 'list-item',
-            color: 'rgba(255, 255, 255, 0.6)',
+            color: 'rgba(255, 255, 255, 0.8)',
             '& > *': {
-              color: 'rgba(255, 255, 255, 0.6)'
+              color: 'rgba(255, 255, 255, 0.8)'
             }
           }
         }

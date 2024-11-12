@@ -28,7 +28,7 @@ const ChatMessages = forwardRef<{ scrollToBottom: () => void }, ChatMessagesProp
         className="h-full flex flex-col items-center overflow-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent"
       >
         <div className="w-full h-full p-4 max-w-[1058px]">
-          <div className="relative pb-28">
+          <div className="relative pb-44">
             <div className="flex flex-col rounded-md">
               <div className="flex-1 overflow-y-auto rounded-xl text-sm leading-6 sm:leading-7">
                 {messages?.map((message, index) => {

@@ -2,6 +2,9 @@ import OpenAI from 'openai';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { OpenAIRequest } from './types';
 import { ChatModel } from 'openai/resources/index.mjs';
+import { findRelevantContent } from './embedding';
+import { getSystemPrompt } from '@/lib/prompt';
+
 export async function POST(req: Request) {
   const apiKey = req.headers.get('apiKey');
   const baseURL = req.headers.get('baseURL');
@@ -16,13 +19,22 @@ export async function POST(req: Request) {
       ...(process.env.HTTP_AGENT ? { httpAgent: new HttpsProxyAgent(process.env.HTTP_AGENT) } : {})
     });
 
+    const lastMessage = messages[messages.length - 1];
+
+    const lastMessageContentString =
+      Array.isArray(lastMessage.content) && lastMessage.content.length > 0
+        ? lastMessage.content.map((c) => (c.type === 'text' ? c.text : '')).join('')
+        : (lastMessage.content as string);
+
+    const relevantContent = await findRelevantContent(lastMessageContentString);
+
     const result = openai.chat.completions.create({
       model: (process.env.MODEL as ChatModel) || 'gpt-4o',
       stream: true,
       messages: [
         {
           role: 'system',
-          content: '你是一个万能助手，可以回答任何问题。'
+          content: getSystemPrompt(relevantContent.map((c) => c.name).join('\n'))
         },
         ...messages
       ]

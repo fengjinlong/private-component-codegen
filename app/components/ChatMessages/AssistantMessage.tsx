@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
-import { Avatar } from 'antd';
+import { Avatar, Button, Badge } from 'antd';
+import { CopyOutlined, FileOutlined, RedoOutlined } from '@ant-design/icons';
 import { Markdown } from '../Markdown';
 import { isEqual } from 'lodash';
 
@@ -16,7 +17,7 @@ const AssistantMessage: React.FC<AssistantMessageProps> = memo(
           Bot
         </Avatar>
 
-        <div className="flex flex-1 items-center rounded-xl overflow-auto">
+        <div className="flex flex-col flex-1 items-start gap-4">
           {typeof message === 'string' ? (
             <div className="w-full">
               <Markdown source={message} isChatting={isLoading} isStream></Markdown>
@@ -24,6 +25,19 @@ const AssistantMessage: React.FC<AssistantMessageProps> = memo(
           ) : (
             message
           )}
+          <div className="flex items-center gap-2">
+            <Badge dot color="green">
+              <Button size="small" type="default" icon={<FileOutlined />}>
+                RAG Docs
+              </Button>
+            </Badge>
+            <Button size="small" type="default" icon={<CopyOutlined />}>
+              Copy
+            </Button>
+            <Button size="small" type="default" icon={<RedoOutlined />}>
+              Retry
+            </Button>
+          </div>
         </div>
       </div>
     );

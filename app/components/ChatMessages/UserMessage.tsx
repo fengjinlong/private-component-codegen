@@ -17,7 +17,6 @@ interface UserMessageProps {
 
 const UserMessage: React.FC<UserMessageProps> = memo(
   ({ message }) => {
-    console.log('userMessage render....');
     return (
       <div className="flex flex-row px-2 py-4 mb-4 gap-2">
         <Avatar className="!bg-purple-500" size={32}>

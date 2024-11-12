@@ -17,53 +17,58 @@ const Home = () => {
   };
 
   const handleSubmit = async () => {
-    const newMessages = [
-      ...messages,
-      {
-        id: nanoid(),
-        role: 'user',
-        content: input
-      }
-    ];
-    setMessages(newMessages as Message[]);
-
-    setIsLoading(true);
-    const response = await fetch('/api/openai', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        messages: newMessages
-      } as OpenAIRequest)
-    });
-    const reader = response?.body?.getReader();
-    const textDecoder = new TextDecoder();
-    let received_stream = '';
-    const id = nanoid();
-    while (true) {
-      if (!reader) break;
-      const { done, value } = await reader.read();
-      if (done) {
-        break;
-      }
-      const text = textDecoder.decode(value);
-      received_stream += text;
-      setMessages((messages) => {
-        if (messages.find((message) => message.id === id)) {
-          const newModifiedMessages = messages.map((message) => {
-            if (message.id === id) {
-              return { ...message, content: received_stream };
-            }
-            return message;
-          });
-          return newModifiedMessages;
+    try {
+      const newMessages = [
+        ...messages,
+        {
+          id: nanoid(),
+          role: 'user',
+          content: input
         }
-        return [...messages, { id, role: 'assistant', content: received_stream }];
+      ];
+      setMessages(newMessages as Message[]);
+
+      setIsLoading(true);
+      const response = await fetch('/api/openai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          messages: newMessages
+        } as OpenAIRequest)
       });
+      const reader = response?.body?.getReader();
+      const textDecoder = new TextDecoder();
+      let received_stream = '';
+      const id = nanoid();
+      while (true) {
+        if (!reader) break;
+        const { done, value } = await reader.read();
+        if (done) {
+          break;
+        }
+        const text = textDecoder.decode(value);
+        received_stream += text;
+        setMessages((messages) => {
+          if (messages.find((message) => message.id === id)) {
+            const newModifiedMessages = messages.map((message) => {
+              if (message.id === id) {
+                return { ...message, content: received_stream };
+              }
+              return message;
+            });
+            return newModifiedMessages;
+          }
+          return [...messages, { id, role: 'assistant', content: received_stream }];
+        });
+      }
+      setInput('');
+      setIsLoading(false);
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
     }
-    setInput('');
-    setIsLoading(false);
   };
 
   return (

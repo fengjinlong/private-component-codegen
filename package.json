@@ -8,7 +8,11 @@
     "start": "next start",
     "lint": "next lint",
     "storybook": "storybook dev -p 6006 --debug-webpack",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx lib/db/migrate.ts",
+    "db:push": "drizzle-kit push",
+    "openai:embedding": "tsx app/api/openai/embedDocs.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^0.0.18",
@@ -36,7 +40,12 @@
     "remark-breaks": "^3.0.3",
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
-    "styled-components": "^6.1.13"
+    "styled-components": "^6.1.13",
+    "drizzle-orm": "^0.31.2",
+    "drizzle-zod": "^0.5.1",
+    "postgres": "^3.4.4",
+    "zod": "^3.23.8",
+    "@t3-oss/env-nextjs": "^0.10.1"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^1.9.0",
@@ -63,6 +72,9 @@
     "postcss": "^8",
     "storybook": "^8.3.6",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "dotenv": "^16.4.5",
+    "tsx": "^4.15.7",
+    "drizzle-kit": "^0.22.7"
   }
 }
