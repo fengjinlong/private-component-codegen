@@ -69,7 +69,12 @@ const Home = () => {
       {
         id: nanoid(),
         role: 'user',
-        content: input
+        content: messageImgUrl
+          ? [
+              { type: 'image_url', image_url: { url: messageImgUrl } },
+              { type: 'text', text: input }
+            ]
+          : input
       }
     ]);
   };

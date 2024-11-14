@@ -1,15 +1,12 @@
 interface RAGDocument {
   id: string;
-  title: string;
   content: string;
   score?: number;
-  metadata?: Record<string, string>;
 }
 
 interface RAGDocsShowProps {
   documents: RAGDocument[];
-  loading?: boolean;
-  onDocumentClick?: (doc: RAGDocument) => void;
+  trigger?: React.ReactNode;
 }
 
 export type { RAGDocsShowProps, RAGDocument };

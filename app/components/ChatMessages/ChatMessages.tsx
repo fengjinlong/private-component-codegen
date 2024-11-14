@@ -42,6 +42,7 @@ const ChatMessages = forwardRef<{ scrollToBottom: () => void }, ChatMessagesProp
                           {!isEmpty(message.content) && (
                             <AssistantMessage
                               message={message.content as string}
+                              ragDocs={message.ragDocs}
                               isLoading={isLoading && index === messages.length - 1}
                               onRetry={() => {
                                 onRetry?.(message.id);

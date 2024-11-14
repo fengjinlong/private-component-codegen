@@ -1,56 +1,35 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { RAGDocsShow } from './index';
-import { RAGDocument } from './interface';
+import { Button } from 'antd';
+import RAGDocsShow from './RAGDocsShow';
 
-const meta: Meta<typeof RAGDocsShow> = {
+const meta = {
   title: 'Components/RAGDocsShow',
   component: RAGDocsShow,
-  tags: ['autodocs']
-};
+  parameters: {
+    layout: 'centered'
+  }
+} satisfies Meta<typeof RAGDocsShow>;
 
 export default meta;
-type Story = StoryObj<typeof RAGDocsShow>;
+type Story = StoryObj<typeof meta>;
 
-const mockDocuments: RAGDocument[] = [
+const mockDocuments = [
   {
     id: '1',
-    title: '什么是RAG?',
-    content: 'RAG（检索增强生成）是一种将大型语言模型与外部知识库结合的技术...',
-    score: 0.95,
-    metadata: {
-      source: 'AI文档',
-      date: '2024-03-20'
-    }
+    content: 'This is a sample document with some content that might be relevant to a query.',
+    score: 0.89
   },
   {
     id: '2',
-    title: 'RAG的应用场景',
-    content: 'RAG技术可以应用在问答系统、文档摘要、知识检索等多个领域...',
-    score: 0.88,
-    metadata: {
-      source: '技术博客',
-      author: 'John Doe'
-    }
+    content:
+      'Another document with different content and metadata to demonstrate the component. Another document with different content and metadata to demonstrate the component. Another document with different content and metadata to demonstrate the component. Another document with different content and metadata to demonstrate the component. Another document with different content and metadata to demonstrate the component.',
+    score: 0.75
   }
 ];
 
 export const Default: Story = {
   args: {
     documents: mockDocuments,
-    loading: false
-  }
-};
-
-export const Loading: Story = {
-  args: {
-    documents: mockDocuments,
-    loading: true
-  }
-};
-
-export const Empty: Story = {
-  args: {
-    documents: [],
-    loading: false
+    trigger: <Button>Show Documents</Button>
   }
 };

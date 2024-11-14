@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { Avatar } from 'antd';
+import { Avatar, Image } from 'antd';
 import { isArray, isEqual } from 'lodash';
 import { Markdown } from '../Markdown';
 
@@ -31,10 +31,10 @@ const UserMessage: React.FC<UserMessageProps> = memo(
                 if (content.type === 'image_url') {
                   return (
                     <div key={index}>
-                      <img
+                      <Image
                         className="w-60 rounded-lg"
                         src={content.image_url!.url}
-                        alt="assistant"
+                        alt="user-image"
                       />
                     </div>
                   );

@@ -120,3 +120,31 @@ export const WithLongConversation: Story = {
     ]
   }
 };
+
+export const WithRAGDocs: Story = {
+  args: {
+    ...Default.args,
+    messages: [
+      ...mockMessages,
+      {
+        id: '11',
+        role: 'assistant',
+        content: 'Here is the RAG docs you requested.',
+        ragDocs: [
+          {
+            id: '1',
+            content:
+              'This is a sample document with some content that might be relevant to a query.',
+            score: 0.89
+          },
+          {
+            id: '2',
+            content:
+              'Another document with different content and metadata to demonstrate the component.',
+            score: 0.75
+          }
+        ]
+      }
+    ]
+  }
+};

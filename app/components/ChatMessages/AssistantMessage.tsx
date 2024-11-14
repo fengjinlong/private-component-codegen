@@ -4,15 +4,18 @@ import { CopyOutlined, FileOutlined, RedoOutlined } from '@ant-design/icons';
 import { Markdown } from '../Markdown';
 import { isEqual } from 'lodash';
 import { useCopyData } from '@/lib/utils';
+import RAGDocsShow from '../RAGDocsShow/RAGDocsShow';
+import { RAGDocument } from '../RAGDocsShow/interface';
 
 interface AssistantMessageProps {
   message: string;
   isLoading: boolean;
   onRetry?: () => void;
+  ragDocs?: RAGDocument[];
 }
 
 const AssistantMessage: React.FC<AssistantMessageProps> = memo(
-  ({ message, isLoading, onRetry }) => {
+  ({ message, isLoading, onRetry, ragDocs }) => {
     const { copyData } = useCopyData();
     return (
       <div className="flex mb-4 rounded-xl px-2 py-6 gap-2">
@@ -29,11 +32,18 @@ const AssistantMessage: React.FC<AssistantMessageProps> = memo(
             message
           )}
           <div className="flex items-center gap-2">
-            <Badge dot color="green">
-              <Button size="small" type="default" icon={<FileOutlined />}>
-                RAG Docs
-              </Button>
-            </Badge>
+            {ragDocs && (
+              <RAGDocsShow
+                documents={ragDocs}
+                trigger={
+                  <Badge dot color="green">
+                    <Button size="small" type="default" icon={<FileOutlined />}>
+                      RAG Docs
+                    </Button>
+                  </Badge>
+                }
+              />
+            )}
             <Button
               onClick={() => {
                 copyData(message);

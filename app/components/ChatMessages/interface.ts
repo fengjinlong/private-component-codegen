@@ -1,3 +1,5 @@
+import { RAGDocument } from '../RAGDocsShow/interface';
+
 type MessageContent = {
   type: 'image_url' | 'text';
   image_url?: {
@@ -10,6 +12,7 @@ type Message = {
   id: string;
   role: 'user' | 'assistant' | 'tool';
   content: string | MessageContent[];
+  ragDocs?: RAGDocument[];
 };
 
 interface ChatMessagesProps {

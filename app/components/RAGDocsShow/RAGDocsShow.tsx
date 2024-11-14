@@ -1,53 +1,52 @@
-import React from 'react';
-import { List, Card, Typography } from 'antd';
+import React, { useState } from 'react';
+import { List, Card, Typography, Tag, Modal } from 'antd';
 import type { RAGDocsShowProps } from './interface';
 
-const { Text, Paragraph } = Typography;
+const { Paragraph } = Typography;
 
-const RAGDocsShow: React.FC<RAGDocsShowProps> = ({
-  documents,
-  loading = false,
-  onDocumentClick
-}) => {
+const RAGDocsShow: React.FC<RAGDocsShowProps> = ({ documents, trigger }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
-    <List
-      className="w-full"
-      loading={loading}
-      dataSource={documents}
-      renderItem={(doc) => (
-        <List.Item key={doc.id}>
-          <Card
-            className="w-full cursor-pointer hover:shadow-md transition-shadow"
-            onClick={() => onDocumentClick?.(doc)}
-          >
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <Text strong className="text-lg">
-                  {doc.title}
-                </Text>
-                {doc.score && (
-                  <Text type="secondary" className="text-sm">
-                    相关度: {(doc.score * 100).toFixed(2)}%
-                  </Text>
-                )}
-              </div>
-              <Paragraph className="text-gray-600 mb-0" ellipsis={{ rows: 3 }}>
-                {doc.content}
-              </Paragraph>
-              {doc.metadata && Object.keys(doc.metadata).length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {Object.entries(doc.metadata).map(([key, value]) => (
-                    <Text key={key} type="secondary" className="text-xs">
-                      {key}: {value}
-                    </Text>
-                  ))}
+    <>
+      <div onClick={() => setIsModalOpen(true)}>{trigger}</div>
+      <Modal
+        title="Documents"
+        open={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        footer={null}
+        width={800}
+      >
+        <List
+          className="w-full"
+          dataSource={documents}
+          renderItem={(doc) => (
+            <List.Item key={doc.id} className="!border-none !py-2">
+              <Card className="w-full hover:shadow-md transition-shadow">
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <Paragraph
+                      className="text-gray-600 mb-0"
+                      ellipsis={{ rows: 3, expandable: true, symbol: 'more' }}
+                    >
+                      {doc.content}
+                    </Paragraph>
+                    {doc.score && (
+                      <Tag
+                        color="blue"
+                        className="ml-4 !h-[24px] !leading-[22px] flex items-center"
+                      >
+                        {(doc.score * 100).toFixed(2)}%
+                      </Tag>
+                    )}
+                  </div>
                 </div>
-              )}
-            </div>
-          </Card>
-        </List.Item>
-      )}
-    />
+              </Card>
+            </List.Item>
+          )}
+        />
+      </Modal>
+    </>
   );
 };
 
