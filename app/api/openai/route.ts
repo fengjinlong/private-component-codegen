@@ -14,17 +14,7 @@ const createEnqueueContent = (
     aiResponse: aiResponse || ''
   };
 
-  try {
-    return new TextEncoder().encode(JSON.stringify(data));
-  } catch (error) {
-    console.error('JSON encoding error:', error);
-    return new TextEncoder().encode(
-      JSON.stringify({
-        relevantContent: [],
-        aiResponse: 'Error processing response'
-      })
-    );
-  }
+  return new TextEncoder().encode(`event: message\ndata: ${JSON.stringify(data)}\n\n`);
 };
 
 export async function POST(req: Request) {
@@ -86,7 +76,13 @@ export async function POST(req: Request) {
       }
     });
 
-    return new Response(stream);
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive'
+      }
+    });
   } catch (error: unknown) {
     console.error('error catch', error);
     if (error instanceof Error) {

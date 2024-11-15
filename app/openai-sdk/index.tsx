@@ -16,11 +16,13 @@ const Home = () => {
     setInput(e.target.value);
   };
 
+  console.log('messages', messages);
+
   const handleSendMessage = async (newMessages: Message[]) => {
     try {
       setMessages(newMessages as Message[]);
-
       setIsLoading(true);
+
       const response = await fetch('/api/openai', {
         method: 'POST',
         headers: {
@@ -30,36 +32,81 @@ const Home = () => {
           messages: newMessages
         } as OpenAIRequest)
       });
+
       const reader = response?.body?.getReader();
       const textDecoder = new TextDecoder();
       let received_stream = '';
       const id = nanoid();
+      let buffer = '';
+
       while (true) {
         if (!reader) break;
         const { done, value } = await reader.read();
+
         if (done) {
           break;
         }
-        const text = textDecoder.decode(value);
-        console.log('text', text);
-        const { relevantContent, aiResponse } = JSON.parse(text);
-        received_stream += aiResponse;
-        setMessages((messages) => {
-          if (messages.find((message) => message.id === id)) {
-            const newModifiedMessages = messages.map((message) => {
-              if (message.id === id) {
-                return { ...message, content: received_stream, ragDocs: relevantContent };
-              }
-              return message;
-            });
-            return newModifiedMessages;
+
+        // 将新的数据块添加到缓冲区
+        buffer += textDecoder.decode(value, { stream: true });
+
+        // 处理缓冲区中的所有完整消息
+        const messages = buffer.split('\n\n');
+        buffer = messages.pop() || ''; // 保留最后一个不完整的消息
+
+        for (const message of messages) {
+          if (!message.trim()) continue;
+
+          const lines = message.split('\n');
+          const dataLine = lines.find((line) => line.startsWith('data:'));
+
+          if (dataLine) {
+            const jsonData = dataLine.slice(5).trim();
+            try {
+              const { relevantContent, aiResponse } = JSON.parse(jsonData) as {
+                relevantContent: Array<{ name: string; similarity: number }>;
+                aiResponse: string;
+              };
+              received_stream += aiResponse;
+
+              setMessages((messages) => {
+                if (messages.find((message) => message.id === id)) {
+                  return messages.map((message) => {
+                    if (message.id === id) {
+                      return {
+                        ...message,
+                        content: received_stream,
+                        ragDocs: relevantContent.map(({ name, similarity }) => ({
+                          id: nanoid(),
+                          content: name,
+                          score: similarity
+                        }))
+                      };
+                    }
+                    return message;
+                  });
+                }
+                return [
+                  ...messages,
+                  {
+                    id,
+                    role: 'assistant',
+                    content: received_stream,
+                    ragDocs: relevantContent.map(({ name, similarity }) => ({
+                      id: nanoid(),
+                      content: name,
+                      score: similarity
+                    }))
+                  }
+                ];
+              });
+            } catch (e) {
+              console.error('Error parsing SSE data:', e);
+            }
           }
-          return [
-            ...messages,
-            { id, role: 'assistant', content: received_stream, ragDocs: relevantContent }
-          ];
-        });
+        }
       }
+
       setInput('');
       setMessageImgUrl('');
       setIsLoading(false);
