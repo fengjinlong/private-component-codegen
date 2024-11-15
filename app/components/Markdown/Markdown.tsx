@@ -18,9 +18,7 @@ const Markdown = ({ source, isChatting = false, isStream = false }: MarkdownProp
   const className = useClassName();
   const [visibleContent, setVisibleContent] = useState('');
   const currentPositionRef = useRef(0);
-  const sourceRef = useRef('');
 
-  // Reset logic when source changes completely
   useEffect(() => {
     if (!isStream) {
       return;
@@ -28,21 +26,6 @@ const Markdown = ({ source, isChatting = false, isStream = false }: MarkdownProp
 
     if (!isChatting) {
       setVisibleContent(source);
-      return;
-    }
-
-    // If new source is shorter than what we have, it's a new message
-    if (source.length < sourceRef.current.length) {
-      currentPositionRef.current = 0;
-      setVisibleContent('');
-    }
-
-    sourceRef.current = source;
-  }, [source, isChatting, isStream]);
-
-  // Progressive rendering logic
-  useEffect(() => {
-    if (!isStream) {
       return;
     }
 

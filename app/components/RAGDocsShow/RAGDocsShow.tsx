@@ -26,7 +26,7 @@ const RAGDocsShow: React.FC<RAGDocsShowProps> = ({ documents, trigger }) => {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <Paragraph
-                      className="text-gray-600 mb-0"
+                      className="mb-0"
                       ellipsis={{ rows: 3, expandable: true, symbol: 'more' }}
                     >
                       {doc.content}

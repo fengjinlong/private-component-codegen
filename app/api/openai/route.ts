@@ -5,6 +5,28 @@ import { ChatModel } from 'openai/resources/index.mjs';
 import { findRelevantContent } from './embedding';
 import { getSystemPrompt } from '@/lib/prompt';
 
+const createEnqueueContent = (
+  relevantContent: Array<{ name: string; similarity: number }>,
+  aiResponse: string
+) => {
+  const data = {
+    relevantContent: relevantContent || [],
+    aiResponse: aiResponse || ''
+  };
+
+  try {
+    return new TextEncoder().encode(JSON.stringify(data));
+  } catch (error) {
+    console.error('JSON encoding error:', error);
+    return new TextEncoder().encode(
+      JSON.stringify({
+        relevantContent: [],
+        aiResponse: 'Error processing response'
+      })
+    );
+  }
+};
+
 export async function POST(req: Request) {
   const apiKey = req.headers.get('apiKey');
   const baseURL = req.headers.get('baseURL');
@@ -48,9 +70,8 @@ export async function POST(req: Request) {
       async start(controller) {
         try {
           for await (const chunk of await result) {
-            controller.enqueue(new TextEncoder().encode(chunk?.choices?.[0]?.delta?.content || ''));
             controller.enqueue(
-              chunk?.choices?.[0]?.delta?.tool_calls?.[0]?.function?.arguments || ''
+              createEnqueueContent(relevantContent, chunk?.choices?.[0]?.delta?.content || '')
             );
           }
         } catch (err) {

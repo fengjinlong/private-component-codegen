@@ -26,13 +26,13 @@ const UserMessage: React.FC<UserMessageProps> = memo(
           {typeof message === 'string' ? (
             <Markdown source={message}></Markdown>
           ) : isArray(message) ? (
-            <React.Fragment>
+            <div className="flex flex-col">
               {message.map((content, index) => {
                 if (content.type === 'image_url') {
                   return (
                     <div key={index}>
                       <Image
-                        className="w-60 rounded-lg"
+                        className="!max-w-24 rounded-lg"
                         src={content.image_url!.url}
                         alt="user-image"
                       />
@@ -41,7 +41,7 @@ const UserMessage: React.FC<UserMessageProps> = memo(
                 }
                 return <Markdown key={index} source={content.text!}></Markdown>;
               })}
-            </React.Fragment>
+            </div>
           ) : (
             message
           )}

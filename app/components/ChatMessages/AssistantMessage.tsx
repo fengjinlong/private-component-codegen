@@ -23,7 +23,7 @@ const AssistantMessage: React.FC<AssistantMessageProps> = memo(
           Bot
         </Avatar>
 
-        <div className="flex flex-col flex-1 items-start gap-4">
+        <div className="flex flex-col flex-1 items-start gap-4 max-w-[calc(100%-40px)]">
           {typeof message === 'string' ? (
             <div className="w-full">
               <Markdown source={message} isChatting={isLoading} isStream></Markdown>

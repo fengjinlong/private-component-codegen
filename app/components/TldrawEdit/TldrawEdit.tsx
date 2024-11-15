@@ -17,6 +17,7 @@ const Tldraw = dynamic(() => import('@tldraw/tldraw').then((mod) => mod.Tldraw),
 });
 
 const TldrawEdit: FC<TldrawEditProps> = ({ onSubmit }) => {
+  const [, refresh] = useState({});
   const editorRef = useRef<Editor>();
   const classNames = useClassName();
   const [visible, setVisible] = useState(false);
@@ -69,6 +70,7 @@ const TldrawEdit: FC<TldrawEditProps> = ({ onSubmit }) => {
                 isDarkMode: true,
                 id: 'tldraw'
               });
+              refresh({});
             }}
             persistenceKey="tldraw"
           />
@@ -93,7 +95,7 @@ function ExportButton({
         setLoading(true);
         try {
           e.preventDefault();
-          console.log('editor.currentPageShapeIds', editor.currentPageShapeIds);
+          console.log('editor', editor);
 
           const svg = await editor.getSvg(Array.from(editor.currentPageShapeIds));
           if (!svg) {

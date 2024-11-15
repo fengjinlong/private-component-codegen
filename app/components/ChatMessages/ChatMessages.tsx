@@ -71,7 +71,7 @@ const ChatMessages = forwardRef<{ scrollToBottom: () => void }, ChatMessagesProp
                           <div className="ml-3 relative h-6">
                             <Image className="!h-6 min-w-6" src={messageImgUrl} preview={true} />
                             <CloseCircleOutlined
-                              className="absolute size-3 top-[-6px] right-[-6px] cursor-pointer text-white/80 rounded-full hover:text-red-500"
+                              className="absolute size-3 top-[-6px] right-[-6px] cursor-pointer !text-white/80 rounded-full hover:text-red-500"
                               onClick={() => setMessagesImgUrl('')}
                             />
                           </div>

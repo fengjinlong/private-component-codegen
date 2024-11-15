@@ -41,21 +41,27 @@ const Home = () => {
           break;
         }
         const text = textDecoder.decode(value);
-        received_stream += text;
+        console.log('text', text);
+        const { relevantContent, aiResponse } = JSON.parse(text);
+        received_stream += aiResponse;
         setMessages((messages) => {
           if (messages.find((message) => message.id === id)) {
             const newModifiedMessages = messages.map((message) => {
               if (message.id === id) {
-                return { ...message, content: received_stream };
+                return { ...message, content: received_stream, ragDocs: relevantContent };
               }
               return message;
             });
             return newModifiedMessages;
           }
-          return [...messages, { id, role: 'assistant', content: received_stream }];
+          return [
+            ...messages,
+            { id, role: 'assistant', content: received_stream, ragDocs: relevantContent }
+          ];
         });
       }
       setInput('');
+      setMessageImgUrl('');
       setIsLoading(false);
     } catch (error) {
       console.error(error);
