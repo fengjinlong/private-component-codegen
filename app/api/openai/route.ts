@@ -4,6 +4,7 @@ import { OpenAIRequest } from './types';
 import { ChatModel } from 'openai/resources/index.mjs';
 import { findRelevantContent } from './embedding';
 import { getSystemPrompt } from '@/lib/prompt';
+import { env } from '@/lib/env.mjs';
 
 const createEnqueueContent = (
   relevantContent: Array<{ name: string; similarity: number }>,
@@ -26,9 +27,9 @@ export async function POST(req: Request) {
 
   try {
     const openai = new OpenAI({
-      apiKey: apiKey || process.env.OPENAI_API_KEY,
-      baseURL: baseURL || process.env.OPENAI_BASE_URL,
-      ...(process.env.HTTP_AGENT ? { httpAgent: new HttpsProxyAgent(process.env.HTTP_AGENT) } : {})
+      apiKey: apiKey || env.OPENAI_API_KEY,
+      baseURL: baseURL || env.OPENAI_BASE_URL,
+      ...(env.HTTP_AGENT ? { httpAgent: new HttpsProxyAgent(env.HTTP_AGENT) } : {})
     });
 
     const lastMessage = messages[messages.length - 1];
@@ -41,7 +42,8 @@ export async function POST(req: Request) {
     const relevantContent = await findRelevantContent(lastMessageContentString);
 
     const result = openai.chat.completions.create({
-      model: (process.env.MODEL as ChatModel) || 'gpt-4o',
+      model: (env.MODEL as ChatModel) || 'gpt-4o',
+      max_tokens: 4096,
       stream: true,
       messages: [
         {

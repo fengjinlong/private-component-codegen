@@ -3,9 +3,9 @@ import OpenAI from 'openai';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { findSimilarContent } from '@/lib/db/selectors/resources';
 
-const openai = new OpenAI({
-  apiKey: env.OPENAI_API_KEY,
-  baseURL: env.OPENAI_BASE_URL,
+const embeddingAI = new OpenAI({
+  apiKey: env.EMBEDDING_API_KEY,
+  baseURL: env.EMBEDDING_BASE_URL,
   ...(env.HTTP_AGENT ? { httpAgent: new HttpsProxyAgent(env.HTTP_AGENT) } : {})
 });
 
@@ -20,7 +20,7 @@ export const generateEmbeddings = async (
 
   const embeddings = await Promise.all(
     chunks.map(async (chunk) => {
-      const response = await openai.embeddings.create({
+      const response = await embeddingAI.embeddings.create({
         model: env.EMBEDDING,
         input: chunk
       });
@@ -36,7 +36,7 @@ export const generateEmbeddings = async (
 
 export const generateEmbedding = async (value: string): Promise<number[]> => {
   const input = value.replaceAll('\\n', ' ');
-  const response = await openai.embeddings.create({
+  const response = await embeddingAI.embeddings.create({
     model: env.EMBEDDING,
     input
   });
