@@ -23,15 +23,20 @@
     "@emotion/css": "^11.13.4",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
+    "@t3-oss/env-nextjs": "^0.10.1",
     "@tldraw/tldraw": "2.0.0-alpha.17",
     "ai": "^3.1.22",
     "antd": "^5.21.5",
     "canvas-size": "^1.2.6",
+    "drizzle-orm": "^0.31.2",
+    "drizzle-zod": "^0.5.1",
     "https-proxy-agent": "^7.0.5",
+    "llamaindex": "^0.8.22",
     "lodash": "^4.17.21",
     "nanoid": "^5.0.8",
     "next": "14.2.3",
     "openai": "^4.71.1",
+    "postgres": "^3.4.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-markdown": "^8.0.7",
@@ -41,11 +46,7 @@
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
     "styled-components": "^6.1.13",
-    "drizzle-orm": "^0.31.2",
-    "drizzle-zod": "^0.5.1",
-    "postgres": "^3.4.4",
-    "zod": "^3.23.8",
-    "@t3-oss/env-nextjs": "^0.10.1"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^1.9.0",
@@ -66,15 +67,15 @@
     "@types/react-dom": "^18",
     "@types/react-syntax-highlighter": "^15.5.6",
     "autoprefixer": "^10.4.20",
+    "dotenv": "^16.4.5",
+    "drizzle-kit": "^0.22.7",
     "eslint": "^8",
     "eslint-config-next": "15.0.1",
     "eslint-plugin-storybook": "^0.10.1",
     "postcss": "^8",
     "storybook": "^8.3.6",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5",
-    "dotenv": "^16.4.5",
     "tsx": "^4.15.7",
-    "drizzle-kit": "^0.22.7"
+    "typescript": "^5"
   }
 }
