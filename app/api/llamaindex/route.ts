@@ -1,4 +1,11 @@
-import OpenAI from 'openai';
+import {
+  Document,
+  OpenAI,
+  ContextChatEngine,
+  VectorStoreIndex,
+  ChatMessage,
+  MessageContent
+} from 'llamaindex';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { OpenAIRequest } from './types';
 import { ChatModel } from 'openai/resources/index.mjs';
@@ -23,45 +30,48 @@ export async function POST(req: Request) {
   const { messages } = request;
 
   try {
-    const openai = new OpenAI({
+    // 初始化 LlamaIndex OpenAI
+    const llm = new OpenAI({
       apiKey: env.OPENAI_API_KEY,
       baseURL: env.OPENAI_BASE_URL,
+      model: (env.MODEL as ChatModel) || 'gpt-4',
+      maxTokens: 4096,
       ...(env.HTTP_AGENT ? { httpAgent: new HttpsProxyAgent(env.HTTP_AGENT) } : {})
     });
 
     const lastMessage = messages[messages.length - 1];
+    const lastMessageContentString = Array.isArray(lastMessage.content)
+      ? lastMessage.content.map((c) => (c.type === 'text' ? c.text : '')).join('')
+      : (lastMessage.content as string);
 
-    const lastMessageContentString =
-      Array.isArray(lastMessage.content) && lastMessage.content.length > 0
-        ? lastMessage.content.map((c) => (c.type === 'text' ? c.text : '')).join('')
-        : (lastMessage.content as string);
-
+    // 获取相关内容并创建文档
     const relevantContent = await findRelevantContent(lastMessageContentString);
+    const documents = relevantContent.map((content) => new Document({ text: content.name }));
 
-    const result = openai.chat.completions.create({
-      model: (env.MODEL as ChatModel) || 'gpt-4o',
-      max_tokens: 4096,
-      stream: true,
-      messages: [
-        {
-          role: 'system',
-          content: getSystemPrompt(relevantContent.map((c) => c.name).join('\n'))
-        },
-        ...messages
-      ]
+    // 创建索引和聊天引擎
+    const index = await VectorStoreIndex.fromDocuments(documents);
+    const chatEngine = new ContextChatEngine({
+      retriever: index.asRetriever({
+        similarityTopK: 5
+      }),
+      chatModel: llm,
+      systemPrompt: getSystemPrompt(relevantContent.map((c) => c.name).join('\n'))
     });
 
-    await result.catch((error) => {
-      throw error;
-    });
+    const userMessage = messages.pop();
 
+    // 创建流式响应
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          for await (const chunk of await result) {
-            controller.enqueue(
-              createEnqueueContent(relevantContent, chunk?.choices?.[0]?.delta?.content || '')
-            );
+          const response = await chatEngine.chat({
+            message: userMessage?.content as MessageContent,
+            chatHistory: messages as ChatMessage<object>[],
+            stream: true
+          });
+
+          for await (const chunk of response) {
+            controller.enqueue(createEnqueueContent(relevantContent, chunk?.delta || ''));
           }
         } catch (err) {
           console.error('Stream error:', err);

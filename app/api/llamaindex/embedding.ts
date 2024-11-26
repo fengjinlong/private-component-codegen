@@ -1,13 +1,20 @@
 import { env } from '@/lib/env.mjs';
-import { OpenAIEmbedding } from 'llamaindex';
-import { Document } from 'llamaindex';
-import { VectorStoreIndex } from 'llamaindex';
+import { MetadataMode, OpenAIEmbedding } from 'llamaindex';
+import { VectorStoreIndex, PGVectorStore } from 'llamaindex';
 import { serviceContextFromDefaults } from 'llamaindex';
 
 // 创建 OpenAI 嵌入模型实例
 const embedModel = new OpenAIEmbedding({
   apiKey: env.EMBEDDING_API_KEY,
   model: env.EMBEDDING
+});
+
+// 添加 PG 数据库连接配置
+const pgvectorStore = new PGVectorStore({
+  clientConfig: {
+    connectionString: env.DATABASE_URL
+  },
+  tableName: 'embeddings'
 });
 
 // 创建服务上下文
@@ -21,14 +28,14 @@ export const generateEmbeddings = async (
 ): Promise<Array<{ embedding: number[]; content: string }>> => {
   const chunks = value.split('-------split line-------');
 
-  const documents = chunks.map((chunk) => new Document({ text: chunk }));
+  // const documents = chunks.map((chunk) => new Document({ text: chunk }));
 
   // 获取所有文档的嵌入
   const embeddings = await Promise.all(
-    documents.map(async (doc) => {
-      const embedding = await embedModel.getTextEmbedding(doc.text);
+    chunks.map(async (chunk) => {
+      const embedding = await embedModel.getTextEmbedding(chunk);
       return {
-        content: doc.text,
+        content: chunk,
         embedding: embedding
       };
     })
@@ -48,18 +55,19 @@ export const generateEmbedding = async (value: string): Promise<number[]> => {
 export const findRelevantContent = async (
   userQuery: string
 ): Promise<{ name: string; similarity: number }[]> => {
-  // 创建或获取已存在的索引
-  const index = await VectorStoreIndex.fromDocuments([], { serviceContext });
+  // 使用 PGVectorStore 创建索引
+  const index = await VectorStoreIndex.fromVectorStore(pgvectorStore, serviceContext);
 
   // 创建检索器
-  const retriever = index.asRetriever();
-  retriever.similarityTopK = 5; // 获取前5个最相似的结果
+  const retriever = index.asRetriever({
+    similarityTopK: 5
+  });
 
   // 执行相似度搜索
   const results = await retriever.retrieve(userQuery);
 
   return results.map((node) => ({
-    name: node.text,
+    name: node.node.getContent(MetadataMode.ALL) || '',
     similarity: node.score || 0
   }));
 };
