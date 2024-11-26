@@ -1,10 +1,10 @@
-import { OpenAI, ContextChatEngine, ChatMessage, MessageContent } from 'llamaindex';
+import { ChatOpenAI } from '@langchain/openai';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 import { OpenAIRequest } from './types';
-import { ChatModel } from 'openai/resources/index.mjs';
 import { findRelevantContent } from './embedding';
 import { getSystemPrompt } from '@/lib/prompt';
 import { env } from '@/lib/env.mjs';
-import { createRetriever } from './embedding';
+import { AIMessage, HumanMessage, SystemMessage } from '@langchain/core/messages';
 
 const createEnqueueContent = (
   relevantContent: Array<{ name: string; similarity: number }>,
@@ -23,46 +23,53 @@ export async function POST(req: Request) {
   const { messages } = request;
 
   try {
-    // 初始化 LlamaIndex OpenAI
-    const llm = new OpenAI({
-      apiKey: env.OPENAI_API_KEY,
-      model: (env.MODEL as ChatModel) || 'gpt-4',
+    const chat = new ChatOpenAI({
+      openAIApiKey: env.OPENAI_API_KEY,
+      configuration: {
+        baseURL: env.OPENAI_BASE_URL,
+        ...(env.HTTP_AGENT ? { httpAgent: new HttpsProxyAgent(env.HTTP_AGENT) } : {})
+      },
+      modelName: env.MODEL || 'gpt-4',
       maxTokens: 4096,
-      additionalSessionOptions: {
-        baseURL: env.OPENAI_BASE_URL
-      }
+      streaming: true
     });
 
     const lastMessage = messages[messages.length - 1];
-    const lastMessageContentString = Array.isArray(lastMessage.content)
-      ? lastMessage.content.map((c) => (c.type === 'text' ? c.text : '')).join('')
-      : (lastMessage.content as string);
+    const lastMessageContentString =
+      Array.isArray(lastMessage.content) && lastMessage.content.length > 0
+        ? lastMessage.content.map((c) => (c.type === 'text' ? c.text : '')).join('')
+        : (lastMessage.content as string);
 
-    // TODO: 直接从retriever中获取相关内容
     const relevantContent = await findRelevantContent(lastMessageContentString);
 
-    // 创建索引和聊天引擎
-    const retriever = await createRetriever();
-    const chatEngine = new ContextChatEngine({
-      retriever,
-      chatModel: llm,
-      systemPrompt: getSystemPrompt(relevantContent.map((c) => c.name).join('\n'))
+    const langChainMessages = messages.map((msg) => {
+      switch (msg.role) {
+        case 'system':
+          return new SystemMessage(msg.content as string);
+        case 'assistant':
+          return new AIMessage(msg.content as string);
+        default:
+          return new HumanMessage(msg.content as string);
+      }
     });
 
-    const userMessage = messages.pop();
+    // 添加系统提示
+    langChainMessages.unshift(
+      new SystemMessage(getSystemPrompt(relevantContent.map((c) => c.name).join('\n')))
+    );
 
-    // 创建流式响应
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          const response = await chatEngine.chat({
-            message: userMessage?.content as MessageContent,
-            chatHistory: messages as ChatMessage<object>[],
-            stream: true
-          });
+          const stream = await chat.stream(langChainMessages);
 
-          for await (const chunk of response) {
-            controller.enqueue(createEnqueueContent(relevantContent, chunk?.delta || ''));
+          for await (const chunk of stream) {
+            controller.enqueue(
+              createEnqueueContent(
+                relevantContent,
+                typeof chunk.content === 'string' ? chunk.content : String(chunk.content)
+              )
+            );
           }
         } catch (err) {
           console.error('Stream error:', err);

@@ -50,18 +50,20 @@ export const generateEmbedding = async (value: string): Promise<number[]> => {
   return await embedModel.getTextEmbedding(input);
 };
 
-// 查找相关内容
-
-export const findRelevantContent = async (
-  userQuery: string
-): Promise<{ name: string; similarity: number }[]> => {
+export const createRetriever = async () => {
   // 使用 PGVectorStore 创建索引
   const index = await VectorStoreIndex.fromVectorStore(pgvectorStore, serviceContext);
 
   // 创建检索器
-  const retriever = index.asRetriever({
+  return index.asRetriever({
     similarityTopK: 5
   });
+};
+
+export const findRelevantContent = async (
+  userQuery: string
+): Promise<{ name: string; similarity: number }[]> => {
+  const retriever = await createRetriever();
 
   // 执行相似度搜索
   const results = await retriever.retrieve(userQuery);
