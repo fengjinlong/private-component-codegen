@@ -1,20 +1,39 @@
+import postgres from 'postgres';
 import { env } from '@/lib/env.mjs';
 import { MetadataMode, OpenAIEmbedding } from 'llamaindex';
 import { VectorStoreIndex, PGVectorStore } from 'llamaindex';
 import { serviceContextFromDefaults } from 'llamaindex';
 
+// 创建 postgres 连接
+const connection = postgres(env.DATABASE_URL);
+
+// 首先创建一个视图来匹配 LlamaIndex 的预期结构
+await connection.unsafe(`
+  CREATE OR REPLACE VIEW llamaindex_embedding AS
+  SELECT 
+    id,
+    content,
+    embedding as embeddings,  -- 重命名 embedding 列为 embeddings
+    resource_id as collection -- 使用 resource_id 作为 collection
+  FROM embeddings;
+`);
+
 // 创建 OpenAI 嵌入模型实例
 const embedModel = new OpenAIEmbedding({
   apiKey: env.EMBEDDING_API_KEY,
-  model: env.EMBEDDING
+  model: env.EMBEDDING,
+  additionalSessionOptions: {
+    baseURL: env.EMBEDDING_BASE_URL
+  }
 });
 
-// 添加 PG 数据库连接配置
 const pgvectorStore = new PGVectorStore({
-  clientConfig: {
-    connectionString: env.DATABASE_URL
-  },
-  tableName: 'embeddings'
+  client: connection,
+  shouldConnect: false,
+  tableName: 'llamaindex_embedding1',
+  schemaName: 'public',
+  dimensions: 1536,
+  performSetup: false
 });
 
 // 创建服务上下文
@@ -27,8 +46,6 @@ export const generateEmbeddings = async (
   value: string
 ): Promise<Array<{ embedding: number[]; content: string }>> => {
   const chunks = value.split('-------split line-------');
-
-  // const documents = chunks.map((chunk) => new Document({ text: chunk }));
 
   // 获取所有文档的嵌入
   const embeddings = await Promise.all(
@@ -67,6 +84,8 @@ export const findRelevantContent = async (
 
   // 执行相似度搜索
   const results = await retriever.retrieve(userQuery);
+
+  console.log('results', results);
 
   return results.map((node) => ({
     name: node.node.getContent(MetadataMode.ALL) || '',

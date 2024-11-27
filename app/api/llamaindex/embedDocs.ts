@@ -1,24 +1,66 @@
-import fs from 'fs';
 import { env } from '@/lib/env.mjs';
-import { createResource, deleteAllEmbeddings } from '@/lib/db/actions/resources';
-import { generateEmbeddings } from './embedding';
+import {
+  VectorStoreIndex,
+  PGVectorStore,
+  SimpleDirectoryReader,
+  FILE_EXT_TO_READER,
+  Document
+} from 'llamaindex';
+import { storageContextFromDefaults } from 'llamaindex/storage/StorageContext';
+import postgres from 'postgres';
 
-console.log('env.EMBEDDING', env.EMBEDDING);
+export const DATA_DIR = './ai-docs';
 
-export const generateEmbeddingsFromDocs = async () => {
-  console.log('start reading docs');
-  const docs = fs.readFileSync('./ai-docs/basic-components.txt', 'utf8');
+export function getExtractors() {
+  return FILE_EXT_TO_READER;
+}
 
-  console.log('start generating embeddings');
-  const embeddings = await generateEmbeddings(docs);
+export async function getDocuments() {
+  const documents = await new SimpleDirectoryReader().loadData({
+    directoryPath: DATA_DIR
+  });
 
-  await deleteAllEmbeddings();
-  console.log('reset all resources');
+  const splitDocs: Document[] = [];
+  for (const doc of documents) {
+    const splits = doc.text.split('-------split line-------');
+    const splitDocuments = splits.map((text) => new Document({ text }));
+    splitDocs.push(...splitDocuments);
+  }
 
-  console.log('start creating resource');
-  await createResource({ content: docs }, embeddings);
+  return splitDocs;
+}
 
-  console.log('success~~~');
-};
+async function getRuntime(func: () => Promise<void>) {
+  const start = Date.now();
+  await func();
+  const end = Date.now();
+  return end - start;
+}
 
-generateEmbeddingsFromDocs();
+async function generateDatasource() {
+  console.log(`正在生成存储上下文...`);
+  const ms = await getRuntime(async () => {
+    const pgClient = postgres(env.DATABASE_URL);
+
+    const vectorStore = new PGVectorStore({
+      client: pgClient,
+      tableName: 'llamaindex_embeddings'
+    });
+
+    const documents = await getDocuments();
+    const storageContext = await storageContextFromDefaults({
+      vectorStore
+    });
+
+    await VectorStoreIndex.fromDocuments(documents, {
+      storageContext
+    });
+
+    // 关闭数据库连接
+    await pgClient.end();
+  });
+  console.log(`存储上下文成功生成，用时 ${ms / 1000} 秒。`);
+}
+
+// 执行函数
+generateDatasource().catch(console.error);

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { nanoid } from 'nanoid';
 import { Message } from '../components/ChatMessages/interface';
 import ChatMessages from '../components/ChatMessages/ChatMessages';
-import { OpenAIRequest } from '../api/openai/types';
+import { OpenAIRequest } from '../api/llamaindex/types';
 
 const Home = () => {
   const [input, setInput] = useState('');
@@ -21,7 +21,7 @@ const Home = () => {
       setMessages(newMessages as Message[]);
       setIsLoading(true);
 
-      const response = await fetch('/api/openai', {
+      const response = await fetch('/api/llamaindex', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

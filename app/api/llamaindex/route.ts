@@ -1,13 +1,25 @@
-import { OpenAI, ContextChatEngine, ChatMessage, MessageContent } from 'llamaindex';
+export const runtime = 'nodejs';
+
+import {
+  OpenAI,
+  ContextChatEngine,
+  ChatMessage,
+  MessageContent,
+  VectorStoreIndex,
+  PGVectorStore,
+  serviceContextFromDefaults,
+  OpenAIEmbedding,
+  Settings,
+  CallbackManager
+} from 'llamaindex';
 import { OpenAIRequest } from './types';
 import { ChatModel } from 'openai/resources/index.mjs';
-import { findRelevantContent } from './embedding';
 import { getSystemPrompt } from '@/lib/prompt';
 import { env } from '@/lib/env.mjs';
-import { createRetriever } from './embedding';
+import postgres from 'postgres';
 
 const createEnqueueContent = (
-  relevantContent: Array<{ name: string; similarity: number }>,
+  relevantContent: Array<{ content: string; similarity: number }>,
   aiResponse: string
 ) => {
   const data = {
@@ -23,43 +35,76 @@ export async function POST(req: Request) {
   const { messages } = request;
 
   try {
-    // 初始化 LlamaIndex OpenAI
     const llm = new OpenAI({
       apiKey: env.OPENAI_API_KEY,
-      model: (env.MODEL as ChatModel) || 'gpt-4',
+      model: (env.MODEL as ChatModel) || 'gpt-4o',
       maxTokens: 4096,
       additionalSessionOptions: {
         baseURL: env.OPENAI_BASE_URL
       }
     });
 
-    const lastMessage = messages[messages.length - 1];
-    const lastMessageContentString = Array.isArray(lastMessage.content)
-      ? lastMessage.content.map((c) => (c.type === 'text' ? c.text : '')).join('')
-      : (lastMessage.content as string);
+    const embedModel = new OpenAIEmbedding({
+      apiKey: env.EMBEDDING_API_KEY,
+      model: env.EMBEDDING,
+      additionalSessionOptions: {
+        baseURL: env.EMBEDDING_BASE_URL
+      }
+    });
 
-    // TODO: 直接从retriever中获取相关内容
-    const relevantContent = await findRelevantContent(lastMessageContentString);
+    const pgClient = postgres(env.DATABASE_URL);
 
-    // 创建索引和聊天引擎
-    const retriever = await createRetriever();
+    const pgvectorStore = new PGVectorStore({
+      client: pgClient,
+      tableName: 'llamaindex_embeddings1'
+    });
+
+    const serviceContext = serviceContextFromDefaults({
+      embedModel
+    });
+
+    const index = await VectorStoreIndex.fromVectorStore(pgvectorStore, serviceContext);
+
+    // 创建检索器
+    const retriever = index.asRetriever({
+      similarityTopK: 5
+    });
+
     const chatEngine = new ContextChatEngine({
       retriever,
       chatModel: llm,
-      systemPrompt: getSystemPrompt(relevantContent.map((c) => c.name).join('\n'))
+      systemPrompt: getSystemPrompt()
     });
 
     const userMessage = messages.pop();
+
+    let relevantContent: Array<{ content: string; similarity: number }> = [];
+
+    const createCallbackManager = () => {
+      const callbackManager = new CallbackManager();
+      // retrieve-end
+      callbackManager.on('retrieve-end', (data) => {
+        const { nodes } = data.detail;
+        console.log('nodes', nodes);
+        relevantContent = nodes.map((node) => ({
+          content: node.node.toJSON().text,
+          similarity: node.score || 0
+        }));
+      });
+      return callbackManager;
+    };
 
     // 创建流式响应
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          const response = await chatEngine.chat({
-            message: userMessage?.content as MessageContent,
-            chatHistory: messages as ChatMessage<object>[],
-            stream: true
-          });
+          const response = await Settings.withCallbackManager(createCallbackManager(), () =>
+            chatEngine.chat({
+              message: userMessage?.content as MessageContent,
+              chatHistory: messages as ChatMessage<object>[],
+              stream: true
+            })
+          );
 
           for await (const chunk of response) {
             controller.enqueue(createEnqueueContent(relevantContent, chunk?.delta || ''));

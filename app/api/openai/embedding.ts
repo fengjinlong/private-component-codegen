@@ -45,7 +45,7 @@ export const generateEmbedding = async (value: string): Promise<number[]> => {
 
 export const findRelevantContent = async (
   userQuery: string
-): Promise<{ name: string; similarity: number }[]> => {
+): Promise<{ content: string; similarity: number }[]> => {
   const userQueryEmbedded = await generateEmbedding(userQuery);
   return findSimilarContent(userQueryEmbedded);
 };

@@ -7,7 +7,7 @@ import { sql, gt, desc } from 'drizzle-orm';
 export const findSimilarContent = async (userQueryEmbedded: number[]) => {
   const similarity = sql<number>`1 - (${cosineDistance(embeddings.embedding, userQueryEmbedded)})`;
   const similarGuides = await db
-    .select({ name: embeddings.content, similarity, resourceId: embeddings.resourceId })
+    .select({ content: embeddings.content, similarity, resourceId: embeddings.resourceId })
     .from(embeddings)
     .where(gt(similarity, 0.5))
     .orderBy((t) => desc(t.similarity))

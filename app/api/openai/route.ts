@@ -7,7 +7,7 @@ import { getSystemPrompt } from '@/lib/prompt';
 import { env } from '@/lib/env.mjs';
 
 const createEnqueueContent = (
-  relevantContent: Array<{ name: string; similarity: number }>,
+  relevantContent: Array<{ content: string; similarity: number }>,
   aiResponse: string
 ) => {
   const data = {
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
       messages: [
         {
           role: 'system',
-          content: getSystemPrompt(relevantContent.map((c) => c.name).join('\n'))
+          content: getSystemPrompt(relevantContent.map((c) => c.content).join('\n'))
         },
         ...messages
       ]

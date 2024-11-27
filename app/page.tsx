@@ -6,21 +6,28 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import ChatMainLayout from './components/ChatMainLayout/ChatMainLayout';
 import { Skeleton } from 'antd';
 
+const Loading = () => (
+  <div className="flex flex-col gap-4 px-52 py-4">
+    <Skeleton active />
+    <Skeleton active />
+    <Skeleton active />
+  </div>
+);
+
 const OpenaiSdk = dynamic(() => import('./openai-sdk'), {
   ssr: false,
-  loading: () => (
-    <div className="flex flex-col gap-4 px-52 py-4">
-      <Skeleton active />
-      <Skeleton active />
-      <Skeleton active />
-    </div>
-  )
+  loading: () => <Loading />
+});
+
+const LlamaindexSdk = dynamic(() => import('./llamaindex'), {
+  ssr: false,
+  loading: () => <Loading />
 });
 
 const modelItems = [
   { label: 'OpenAI SDK', key: 'openai-sdk', component: <OpenaiSdk /> },
+  { label: 'LLamaIndex', key: 'llamaindex', component: <LlamaindexSdk /> },
   { label: 'LangChain', key: 'langchain' },
-  { label: 'LLamaIndex', key: 'llamaindex' },
   { label: 'Vercel AI SDK', key: 'vercel-ai-sdk' }
 ];
 
