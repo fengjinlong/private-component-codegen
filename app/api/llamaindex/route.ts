@@ -6,9 +6,6 @@ import {
   ChatMessage,
   MessageContent,
   VectorStoreIndex,
-  PGVectorStore,
-  serviceContextFromDefaults,
-  OpenAIEmbedding,
   Settings,
   CallbackManager
 } from 'llamaindex';
@@ -16,7 +13,7 @@ import { OpenAIRequest } from './types';
 import { ChatModel } from 'openai/resources/index.mjs';
 import { getSystemPrompt } from '@/lib/prompt';
 import { env } from '@/lib/env.mjs';
-import postgres from 'postgres';
+import { pgVectorStore, serviceContext } from './settings';
 
 const createEnqueueContent = (
   relevantContent: Array<{ content: string; similarity: number }>,
@@ -36,34 +33,15 @@ export async function POST(req: Request) {
 
   try {
     const llm = new OpenAI({
-      apiKey: env.OPENAI_API_KEY,
+      apiKey: env.AI_KEY,
       model: (env.MODEL as ChatModel) || 'gpt-4o',
       maxTokens: 4096,
       additionalSessionOptions: {
-        baseURL: env.OPENAI_BASE_URL
+        baseURL: env.AI_BASE_URL
       }
     });
 
-    const embedModel = new OpenAIEmbedding({
-      apiKey: env.EMBEDDING_API_KEY,
-      model: env.EMBEDDING,
-      additionalSessionOptions: {
-        baseURL: env.EMBEDDING_BASE_URL
-      }
-    });
-
-    const pgClient = postgres(env.DATABASE_URL);
-
-    const pgvectorStore = new PGVectorStore({
-      client: pgClient,
-      tableName: 'llamaindex_embeddings1'
-    });
-
-    const serviceContext = serviceContextFromDefaults({
-      embedModel
-    });
-
-    const index = await VectorStoreIndex.fromVectorStore(pgvectorStore, serviceContext);
+    const index = await VectorStoreIndex.fromVectorStore(pgVectorStore, serviceContext);
 
     // 创建检索器
     const retriever = index.asRetriever({

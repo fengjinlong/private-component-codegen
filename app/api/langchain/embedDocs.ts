@@ -1,6 +1,6 @@
 import { DirectoryLoader } from 'langchain/document_loaders/fs/directory';
 import { TextLoader } from 'langchain/document_loaders/fs/text';
-import { vectorStore } from './db';
+import { initVectorStore } from './settings';
 
 async function main() {
   console.log('开始加载文档...');
@@ -23,6 +23,7 @@ async function main() {
 
   // 存储文档
   console.log('开始存储文档向量...');
+  const vectorStore = await initVectorStore();
   await vectorStore.addDocuments(splits);
   console.log('文档向量存储完成！');
 }

@@ -1,7 +1,7 @@
 import { env } from '@/lib/env.mjs';
 import OpenAI from 'openai';
 import { HttpsProxyAgent } from 'https-proxy-agent';
-import { findSimilarContent } from '@/lib/db/openai/selectors';
+import { findSimilarContent } from '@/lib/db/vercelai/selectors';
 
 const embeddingAI = new OpenAI({
   apiKey: env.AI_KEY,

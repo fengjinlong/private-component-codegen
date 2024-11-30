@@ -1,13 +1,7 @@
-import { env } from '@/lib/env.mjs';
-import {
-  VectorStoreIndex,
-  PGVectorStore,
-  SimpleDirectoryReader,
-  FILE_EXT_TO_READER,
-  Document
-} from 'llamaindex';
+import { VectorStoreIndex, SimpleDirectoryReader, FILE_EXT_TO_READER, Document } from 'llamaindex';
 import { storageContextFromDefaults } from 'llamaindex/storage/StorageContext';
-import postgres from 'postgres';
+
+import { pgVectorStore, serviceContext } from './settings';
 
 export const DATA_DIR = './ai-docs';
 
@@ -40,24 +34,17 @@ async function getRuntime(func: () => Promise<void>) {
 async function generateDatasource() {
   console.log(`正在生成存储上下文...`);
   const ms = await getRuntime(async () => {
-    const pgClient = postgres(env.DATABASE_URL);
-
-    const vectorStore = new PGVectorStore({
-      client: pgClient,
-      tableName: 'llamaindex_embeddings'
-    });
-
     const documents = await getDocuments();
     const storageContext = await storageContextFromDefaults({
-      vectorStore
+      vectorStore: pgVectorStore
     });
+
+    console.log('documents.length', documents.length);
 
     await VectorStoreIndex.fromDocuments(documents, {
-      storageContext
+      storageContext,
+      serviceContext
     });
-
-    // 关闭数据库连接
-    await pgClient.end();
   });
   console.log(`存储上下文成功生成，用时 ${ms / 1000} 秒。`);
 }

@@ -8,7 +8,7 @@ import { StringOutputParser } from '@langchain/core/output_parsers';
 import { AIMessage, HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { RunnableSequence } from '@langchain/core/runnables';
-import { vectorStore } from './db';
+import { initVectorStore } from './settings';
 import { ChatCompletionMessageParam } from 'openai/resources/chat/completions.mjs';
 
 const createEnqueueContent = (
@@ -28,14 +28,15 @@ export async function POST(req: Request) {
   const { messages } = request;
 
   try {
+    const vectorStore = await initVectorStore();
     const retriever = async (query: string) => {
       return await vectorStore.similaritySearchWithScore(query, 5);
     };
 
     const llm = new ChatOpenAI({
-      openAIApiKey: env.OPENAI_API_KEY,
+      openAIApiKey: env.AI_KEY,
       configuration: {
-        baseURL: env.OPENAI_BASE_URL,
+        baseURL: env.AI_BASE_URL,
         ...(env.HTTP_AGENT ? { httpAgent: new HttpsProxyAgent(env.HTTP_AGENT) } : {})
       },
       modelName: env.MODEL,
