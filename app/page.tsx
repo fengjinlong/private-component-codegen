@@ -24,10 +24,15 @@ const LlamaindexSdk = dynamic(() => import('./llamaindex'), {
   loading: () => <Loading />
 });
 
+const LangchainSdk = dynamic(() => import('./langchain'), {
+  ssr: false,
+  loading: () => <Loading />
+});
+
 const modelItems = [
   { label: 'OpenAI SDK', key: 'openai-sdk', component: <OpenaiSdk /> },
   { label: 'LLamaIndex', key: 'llamaindex', component: <LlamaindexSdk /> },
-  { label: 'LangChain', key: 'langchain' },
+  { label: 'LangChain', key: 'langchain', component: <LangchainSdk /> },
   { label: 'Vercel AI SDK', key: 'vercel-ai-sdk' }
 ];
 

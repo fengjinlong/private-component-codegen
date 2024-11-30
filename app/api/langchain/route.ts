@@ -1,13 +1,18 @@
 import { ChatOpenAI } from '@langchain/openai';
+import { Document } from '@langchain/core/documents';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { OpenAIRequest } from './types';
-import { findRelevantContent } from './embedding';
 import { getSystemPrompt } from '@/lib/prompt';
 import { env } from '@/lib/env.mjs';
+import { StringOutputParser } from '@langchain/core/output_parsers';
 import { AIMessage, HumanMessage, SystemMessage } from '@langchain/core/messages';
+import { ChatPromptTemplate } from '@langchain/core/prompts';
+import { RunnableSequence } from '@langchain/core/runnables';
+import { vectorStore } from './db';
+import { ChatCompletionMessageParam } from 'openai/resources/chat/completions.mjs';
 
 const createEnqueueContent = (
-  relevantContent: Array<{ name: string; similarity: number }>,
+  relevantContent: Array<{ content: string; similarity: number }>,
   aiResponse: string
 ) => {
   const data = {
@@ -23,51 +28,85 @@ export async function POST(req: Request) {
   const { messages } = request;
 
   try {
-    const chat = new ChatOpenAI({
+    const retriever = async (query: string) => {
+      return await vectorStore.similaritySearchWithScore(query, 5);
+    };
+
+    const llm = new ChatOpenAI({
       openAIApiKey: env.OPENAI_API_KEY,
       configuration: {
         baseURL: env.OPENAI_BASE_URL,
         ...(env.HTTP_AGENT ? { httpAgent: new HttpsProxyAgent(env.HTTP_AGENT) } : {})
       },
-      modelName: env.MODEL || 'gpt-4',
-      maxTokens: 4096,
-      streaming: true
+      modelName: env.MODEL,
+      maxTokens: 4096
     });
 
     const lastMessage = messages[messages.length - 1];
-    const lastMessageContentString =
-      Array.isArray(lastMessage.content) && lastMessage.content.length > 0
-        ? lastMessage.content.map((c) => (c.type === 'text' ? c.text : '')).join('')
-        : (lastMessage.content as string);
-
-    const relevantContent = await findRelevantContent(lastMessageContentString);
 
     const langChainMessages = messages.map((msg) => {
       switch (msg.role) {
-        case 'system':
-          return new SystemMessage(msg.content as string);
         case 'assistant':
           return new AIMessage(msg.content as string);
         default:
-          return new HumanMessage(msg.content as string);
+          return new HumanMessage({
+            content: msg.content!
+          });
       }
     });
 
-    // 添加系统提示
-    langChainMessages.unshift(
-      new SystemMessage(getSystemPrompt(relevantContent.map((c) => c.name).join('\n')))
-    );
+    // 构建一条Context Chain，用来从retriever中检索出相关内容，并格式化为系统提示词
+    const retrieveChain = RunnableSequence.from([
+      (message: ChatCompletionMessageParam) =>
+        Array.isArray(message.content)
+          ? message.content.map((c) => (c.type === 'text' ? c.text : '')).join('\n')
+          : message.content,
+      retriever,
+      (documents: [Document, number][]) => {
+        const relevantContent = documents.map(([doc, score]) => ({
+          content: doc.pageContent,
+          similarity: score || 0
+        }));
+        return {
+          content: documents.map(([doc]) => doc.pageContent).join('\n'),
+          relevantContent
+        };
+      },
+      ({ content, relevantContent }) => ({
+        systemPrompt: getSystemPrompt(content),
+        relevantContent
+      })
+    ]);
+
+    // 构建一条RAG Chain，根据系统提示词和用户消息，生成回答
+    const ragChain = RunnableSequence.from([
+      retrieveChain,
+      async ({ systemPrompt, relevantContent }) => {
+        const prompt = ChatPromptTemplate.fromMessages([
+          new SystemMessage(systemPrompt),
+          ...langChainMessages
+        ]);
+        return {
+          prompt,
+          relevantContent
+        };
+      },
+      async ({ prompt, relevantContent }) => {
+        const stream = await prompt.pipe(llm).pipe(new StringOutputParser()).stream();
+        return { stream, relevantContent };
+      }
+    ]);
 
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          const stream = await chat.stream(langChainMessages);
+          const { stream: llmStream, relevantContent } = await ragChain.invoke(lastMessage);
 
-          for await (const chunk of stream) {
+          for await (const chunk of llmStream) {
             controller.enqueue(
               createEnqueueContent(
                 relevantContent,
-                typeof chunk.content === 'string' ? chunk.content : String(chunk.content)
+                typeof chunk === 'string' ? chunk : String(chunk)
               )
             );
           }

@@ -111,6 +111,12 @@ const Home = () => {
     } catch (error) {
       console.error(error);
       setIsLoading(false);
+      // 如果最后一条消息是用户消息，则去掉最后一条消息
+      setMessages((messages) =>
+        messages.length > 0 && messages[messages.length - 1].role === 'user'
+          ? messages.slice(0, -1)
+          : messages
+      );
     }
   };
 
