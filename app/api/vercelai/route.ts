@@ -1,92 +1,87 @@
-import OpenAI from 'openai';
-import { HttpsProxyAgent } from 'https-proxy-agent';
+import { CoreMessage, createDataStreamResponse, streamText } from 'ai';
 import { OpenAIRequest } from './types';
-import { ChatModel } from 'openai/resources/index.mjs';
 import { findRelevantContent } from './embedding';
 import { getSystemPrompt } from '@/lib/prompt';
 import { env } from '@/lib/env.mjs';
+import { ChatCompletionMessageParam } from 'openai/resources/chat/completions.mjs';
+import { model } from './settings';
 
-const createEnqueueContent = (
-  relevantContent: Array<{ content: string; similarity: number }>,
-  aiResponse: string
-) => {
-  const data = {
-    relevantContent: relevantContent || [],
-    aiResponse: aiResponse || ''
-  };
-
-  return new TextEncoder().encode(`event: message\ndata: ${JSON.stringify(data)}\n\n`);
+export const formatMessages = (messages: ChatCompletionMessageParam[]) => {
+  return messages.map((message) => {
+    return {
+      ...message,
+      role: message.role,
+      content: Array.isArray(message.content)
+        ? message.content.map((content) => {
+            if (content.type === 'image_url') {
+              return {
+                type: 'image',
+                image: content.image_url.url.replace(/^data:image\/\w+;base64,/, '')
+              };
+            }
+            return {
+              ...content
+            };
+          })
+        : message.content
+    };
+  }) as CoreMessage[];
 };
 
-export async function POST(req: Request) {
-  const request: OpenAIRequest = await req.json();
-  const { messages } = request;
+const openaiModel = model(env.MODEL);
 
+export async function POST(req: Request) {
   try {
-    const openai = new OpenAI({
-      apiKey: env.AI_KEY,
-      baseURL: env.AI_BASE_URL,
-      ...(env.HTTP_AGENT ? { httpAgent: new HttpsProxyAgent(env.HTTP_AGENT) } : {})
-    });
+    const request: OpenAIRequest = await req.json();
+    const { messages } = request;
 
     const lastMessage = messages[messages.length - 1];
+    const lastMessageContent = Array.isArray(lastMessage.content)
+      ? lastMessage.content
+          .filter((c) => c.type === 'text')
+          .map((c) => c.text)
+          .join('')
+      : (lastMessage.content as string);
 
-    const lastMessageContentString =
-      Array.isArray(lastMessage.content) && lastMessage.content.length > 0
-        ? lastMessage.content.map((c) => (c.type === 'text' ? c.text : '')).join('')
-        : (lastMessage.content as string);
+    const relevantContent = await findRelevantContent(lastMessageContent);
 
-    const relevantContent = await findRelevantContent(lastMessageContentString);
+    const system = getSystemPrompt(relevantContent.map((c) => c.content).join('\n'));
 
-    const result = openai.chat.completions.create({
-      model: (env.MODEL as ChatModel) || 'gpt-4o',
-      max_tokens: 4096,
-      stream: true,
-      messages: [
-        {
-          role: 'system',
-          content: getSystemPrompt(relevantContent.map((c) => c.content).join('\n'))
-        },
-        ...messages
-      ]
-    });
+    return createDataStreamResponse({
+      execute: async (dataStream) => {
+        // 立即发送相关内容
+        dataStream.writeData({ type: 'relevantContent', content: relevantContent });
 
-    await result.catch((error) => {
-      throw error;
-    });
-
-    const stream = new ReadableStream({
-      async start(controller) {
-        try {
-          for await (const chunk of await result) {
-            controller.enqueue(
-              createEnqueueContent(relevantContent, chunk?.choices?.[0]?.delta?.content || '')
-            );
+        const result = streamText({
+          model: openaiModel,
+          system,
+          messages: formatMessages(messages),
+          onChunk: () => {
+            // 可以在每个chunk时添加额外信息
+            dataStream.writeMessageAnnotation({
+              hasRelevantContent: true,
+              timestamp: Date.now()
+            });
+          },
+          onFinish: () => {
+            // 在完成时发送最终状态
+            dataStream.writeData({ type: 'status', content: 'completed' });
           }
-        } catch (err) {
-          console.error('Stream error:', err);
-          controller.error(err);
-        } finally {
-          controller.close();
-        }
-      },
-      cancel() {
-        console.log('Stream cancelled');
-      }
-    });
+        });
 
-    return new Response(stream, {
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        Connection: 'keep-alive'
+        // 将文本流合并到数据流中
+        result.mergeIntoDataStream(dataStream);
+      },
+      onError: (error) => {
+        console.error('Error in chat completion:', error);
+        return error instanceof Error ? error.message : 'An unknown error occurred';
       }
     });
   } catch (error: unknown) {
-    console.error('error catch', error);
-    if (error instanceof Error) {
-      return new Response(error.message, { status: 400, statusText: 'Bad Request' });
-    }
-    return new Response('An unknown error occurred', { status: 400, statusText: 'Bad Request' });
+    console.error('Error in chat completion:', error);
+    return new Response(error instanceof Error ? error.message : 'An unknown error occurred', {
+      status: 400,
+      statusText: 'Bad Request'
+    });
   }
 }

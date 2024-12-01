@@ -18,7 +18,7 @@
     "vercelai:embedding": "tsx app/api/vercelai/embedDocs.ts"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^0.0.18",
+    "@ai-sdk/openai": "^1.0.5",
     "@ant-design/icons": "^5.5.1",
     "@ant-design/nextjs-registry": "^1.0.1",
     "@ant-design/use-emotion-css": "1.0.4",
@@ -31,7 +31,7 @@
     "@langchain/openai": "^0.3.14",
     "@t3-oss/env-nextjs": "^0.10.1",
     "@tldraw/tldraw": "2.0.0-alpha.17",
-    "ai": "^3.1.22",
+    "ai": "^4.0.9",
     "antd": "^5.21.5",
     "canvas-size": "^1.2.6",
     "drizzle-orm": "^0.31.2",

@@ -1,16 +1,15 @@
 import { env } from '@/lib/env.mjs';
-import OpenAI from 'openai';
-import { HttpsProxyAgent } from 'https-proxy-agent';
+import { embed, embedMany } from 'ai';
 import { findSimilarContent } from '@/lib/db/vercelai/selectors';
+import { model } from './settings';
 
-const embeddingAI = new OpenAI({
-  apiKey: env.AI_KEY,
-  baseURL: env.AI_BASE_URL,
-  ...(env.HTTP_AGENT ? { httpAgent: new HttpsProxyAgent(env.HTTP_AGENT) } : {})
-});
+const embeddingModel = model.embedding(env.EMBEDDING);
 
 const generateChunks = (input: string): string[] => {
-  return input.split('-------split line-------');
+  return input
+    .trim()
+    .split('-------split line-------')
+    .filter((chunk) => chunk !== '');
 };
 
 export const generateEmbeddings = async (
@@ -18,29 +17,28 @@ export const generateEmbeddings = async (
 ): Promise<Array<{ embedding: number[]; content: string }>> => {
   const chunks = generateChunks(value);
 
-  const embeddings = await Promise.all(
-    chunks.map(async (chunk) => {
-      const response = await embeddingAI.embeddings.create({
-        model: env.EMBEDDING,
-        input: chunk
-      });
-      return {
-        content: chunk,
-        embedding: response.data[0].embedding
-      };
-    })
-  );
+  // 使用AI SDK的embedMany函数来批量生成embeddings
+  const { embeddings } = await embedMany({
+    model: embeddingModel,
+    values: chunks
+  });
 
-  return embeddings;
+  return embeddings.map((embedding, i) => ({
+    content: chunks[i],
+    embedding
+  }));
 };
 
 export const generateEmbedding = async (value: string): Promise<number[]> => {
   const input = value.replaceAll('\\n', ' ');
-  const response = await embeddingAI.embeddings.create({
-    model: env.EMBEDDING,
-    input
+
+  // 使用AI SDK的embed函数来生成单个embedding
+  const { embedding } = await embed({
+    model: embeddingModel,
+    value: input
   });
-  return response.data[0].embedding;
+
+  return embedding;
 };
 
 export const findRelevantContent = async (
