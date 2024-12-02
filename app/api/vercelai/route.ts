@@ -49,24 +49,13 @@ export async function POST(req: Request) {
 
     return createDataStreamResponse({
       execute: async (dataStream) => {
-        // 立即发送相关内容
-        dataStream.writeData({ type: 'relevantContent', content: relevantContent });
-
+        dataStream.writeMessageAnnotation({
+          relevantContent
+        });
         const result = streamText({
           model: openaiModel,
           system,
-          messages: formatMessages(messages),
-          onChunk: () => {
-            // 可以在每个chunk时添加额外信息
-            dataStream.writeMessageAnnotation({
-              hasRelevantContent: true,
-              timestamp: Date.now()
-            });
-          },
-          onFinish: () => {
-            // 在完成时发送最终状态
-            dataStream.writeData({ type: 'status', content: 'completed' });
-          }
+          messages: formatMessages(messages)
         });
 
         // 将文本流合并到数据流中

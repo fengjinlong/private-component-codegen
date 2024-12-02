@@ -14,7 +14,7 @@ const CodeLight = dynamic(() => import('./CodeLight'));
 const CHUNK_SIZE = 2; // 每次渲染的字符数
 const RENDER_INTERVAL = 0.5; // 渲染间隔(ms)
 
-const Markdown = ({ source, isChatting = false, isStream = false }: MarkdownProps) => {
+const Markdown: React.FC<MarkdownProps> = ({ source, isChatting = false, isStream = false }) => {
   const className = useClassName();
   const [visibleContent, setVisibleContent] = useState('');
   const currentPositionRef = useRef(0);

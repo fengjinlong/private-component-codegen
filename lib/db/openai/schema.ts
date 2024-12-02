@@ -1,5 +1,3 @@
-'use server';
-
 import { nanoid } from 'nanoid';
 import { index, pgTable, text, varchar, vector } from 'drizzle-orm/pg-core';
 
