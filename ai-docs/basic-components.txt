@@ -337,7 +337,7 @@ return <Breadcrumb itemRender={itemRender} items={items} />;
     <when-to-use>
     A button means an operation (or a series of operations). Clicking a button will trigger corresponding business logic.
 
-In Ant Design we provide 5 types of button.
+In @private-basic-components we provide 5 types of button.
 
 - Primary button: indicate the main action, one primary button at most in one section.
 - Default button: indicate a series of actions without priority.
@@ -416,10 +416,10 @@ It accepts all props which native buttons support.
 | dateCellRender | Customize the display of the date cell, the returned content will be appended to the cell | function(date: Dayjs): ReactNode | - |  |
 | dateFullCellRender | Customize the display of the date cell, the returned content will override the cell | function(date: Dayjs): ReactNode | - |  |
 | defaultValue | The date selected by default | [dayjs](https://day.js.org/) | - |  |
-| disabledDate | Function that specifies the dates that cannot be selected, `currentDate` is same dayjs object as `value` prop which you shouldn't mutate it](https://github.com/ant-design/ant-design/issues/30987) | (currentDate: Dayjs) => boolean | - |  |
+| disabledDate | Function that specifies the dates that cannot be selected, `currentDate` is same dayjs object as `value` prop which you shouldn't mutate it](https://github.com/@private-basic-components/@private-basic-components/issues/30987) | (currentDate: Dayjs) => boolean | - |  |
 | fullscreen | Whether to display in full-screen | boolean | true |  |
 | headerRender | Render custom header in panel | function(object:{value: Dayjs, type: string, onChange: f(), onTypeChange: f()}) | - |  |
-| locale | The calendar's locale | object | [(default)](https://github.com/ant-design/ant-design/blob/master/components/date-picker/locale/example.json) |  |
+| locale | The calendar's locale | object | [(default)](https://github.com/@private-basic-components/@private-basic-components/blob/master/components/date-picker/locale/example.json) |  |
 | mode | The display mode of the calendar | `month` \| `year` | `month` |  |
 | monthCellRender | Customize the display of the month cell, the returned content will be appended to the cell | function(date: Dayjs): ReactNode | - |  |
 | monthFullCellRender | Customize the display of the month cell, the returned content will override the cell | function(date: Dayjs): ReactNode | - |  |
@@ -574,7 +574,7 @@ It accepts all props which native buttons support.
 | --- | --- | --- | --- | --- |
 | filter | The function will receive two arguments, inputValue and option, if the function returns true, the option will be included in the filtered set; Otherwise, it will be excluded | function(inputValue, path): boolean | - |  |
 | limit | Set the count of filtered items | number \| false | 50 |  |
-| matchInputWidth | Whether the width of list matches input, ([how it looks](https://github.com/ant-design/ant-design/issues/25779)) | boolean | true |  |
+| matchInputWidth | Whether the width of list matches input, ([how it looks](https://github.com/@private-basic-components/@private-basic-components/issues/25779)) | boolean | true |  |
 | render | Used to render filtered options | function(inputValue, path): ReactNode | - |  |
 | sort | Used to sort filtered options | function(a, b, inputValue) | - |  |
 
@@ -742,7 +742,7 @@ const items: CollapseProps['items'] = [
     <API>
     Common props ref：[Common props](/docs/react/common-props)
 
-> This component is available since `antd@5.5.0`.
+> This component is available since `@private-basic-components@5.5.0`.
 
 <!-- prettier-ignore -->
 | Property | Description | Type | Default | Version |
@@ -804,12 +804,12 @@ There are five kinds of picker:
 
 ### Localization
 
-The default locale is en-US, if you need to use other languages, recommend to use internationalized components provided by us at the entrance. Look at: [ConfigProvider](https://ant.design/components/config-provider/).
+The default locale is en-US, if you need to use other languages, recommend to use internationalized components provided by us at the entrance. Look at: [ConfigProvider](https://@private-basic-components/components/config-provider/).
 
-If there are special needs (only modifying single component language), Please use the property: local. Example: [default](https://github.com/ant-design/ant-design/blob/master/components/date-picker/locale/example.json).
+If there are special needs (only modifying single component language), Please use the property: local. Example: [default](https://github.com/@private-basic-components/@private-basic-components/blob/master/components/date-picker/locale/example.json).
 
 ```jsx
-import locale from 'antd/es/date-picker/locale/zh_CN';
+import locale from '@private-basic-components/es/date-picker/locale/zh_CN';
 
 import 'dayjs/locale/zh-cn';
 
@@ -818,7 +818,7 @@ import 'dayjs/locale/zh-cn';
 
 ```jsx
 // The default locale is en-US, if you want to use other locale, just set locale in entry file globally.
-import locale from 'antd/locale/zh_CN';
+import locale from '@private-basic-components/locale/zh_CN';
 import dayjs from 'dayjs';
 
 import 'dayjs/locale/zh-cn';
@@ -847,7 +847,7 @@ The following APIs are shared by DatePicker, RangePicker.
 | popupClassName | To customize the className of the popup calendar | string | - | 4.23.0 |
 | getPopupContainer | To set the container of the floating layer, while the default is to create a `div` element in `body` | function(trigger) | - |  |
 | inputReadOnly | Set the `readonly` attribute of the input tag (avoids virtual keyboard on touch devices) | boolean | false |  |
-| locale | Localization configuration | object | [default](https://github.com/ant-design/ant-design/blob/master/components/date-picker/locale/example.json) |  |
+| locale | Localization configuration | object | [default](https://github.com/@private-basic-components/@private-basic-components/blob/master/components/date-picker/locale/example.json) |  |
 | mode | The picker panel mode（ [Cannot select year or month anymore?](/docs/react/faq#when-set-mode-to-datepickerrangepicker-cannot-select-year-or-month-anymore) ) | `time` \| `date` \| `month` \| `year` \| `decade` | - |  |
 | nextIcon | The custom next icon | ReactNode | - | 4.17.0 |
 | open | The open state of picker | boolean | - |  |
@@ -1027,7 +1027,7 @@ const items: DescriptionsProps['items'] = [
 | --- | --- | --- | --- | --- |
 | bordered | Whether to display the border | boolean | false |  |
 | colon | Change default props `colon` value of Descriptions.Item | boolean | true |  |
-| column | The number of `DescriptionItems` in a row,could be a number or a object like `{ xs: 8, sm: 16, md: 24}`,(Only set `bordered={true}` to take effect) | number \| [Record<Breakpoint, number>](https://github.com/ant-design/ant-design/blob/84ca0d23ae52e4f0940f20b0e22eabe743f90dca/components/descriptions/index.tsx#L111C21-L111C56) | 3 |  |
+| column | The number of `DescriptionItems` in a row,could be a number or a object like `{ xs: 8, sm: 16, md: 24}`,(Only set `bordered={true}` to take effect) | number \| [Record<Breakpoint, number>](https://github.com/@private-basic-components/@private-basic-components/blob/84ca0d23ae52e4f0940f20b0e22eabe743f90dca/components/descriptions/index.tsx#L111C21-L111C56) | 3 |  |
 | contentStyle | Customize content style | CSSProperties | - | 4.10.0 |
 | extra | The action area of the description list, placed at the top-right | ReactNode | - | 4.5.0 |
 | items | Describe the contents of the list item | [DescriptionsItem](#descriptionitem)[] | - | 5.8.0 |
@@ -1195,7 +1195,7 @@ Same props from Dropdown. And includes additional props:
     </when-to-use>
 
     <API>
-    > This component is available since `antd@5.10.0`. The default behavior of Flex in horizontal mode is to align upward, In vertical mode, aligns the stretch, You can adjust this via properties.
+    > This component is available since `@private-basic-components@5.10.0`. The default behavior of Flex in horizontal mode is to align upward, In vertical mode, aligns the stretch, You can adjust this via properties.
 
 Common props ref：[Common props](/docs/react/common-props)
 
@@ -1221,7 +1221,7 @@ Common props ref：[Common props](/docs/react/common-props)
     <API>
     Common props ref：[Common props](/docs/react/common-props)
 
-> This component is available since `antd@5.0.0`.
+> This component is available since `@private-basic-components@5.0.0`.
 
 ### common API
 
@@ -1471,7 +1471,7 @@ Supports all props of `Input`.
 | grid | The grid type of list. You can set grid to something like {gutter: 16, column: 4} | [object](#list-grid-props) | - |  |
 | header | List header renderer | ReactNode | - |  |
 | itemLayout | The layout of list | `horizontal` \| `vertical` | `horizontal` |  |
-| loading | Shows a loading indicator while the contents of the list are being fetched | boolean \| [SpinProps](/components/spin/#api) ([more](https://github.com/ant-design/ant-design/issues/8659)) | false |  |
+| loading | Shows a loading indicator while the contents of the list are being fetched | boolean \| [SpinProps](/components/spin/#api) ([more](https://github.com/@private-basic-components/@private-basic-components/issues/8659)) | false |  |
 | loadMore | Shows a load more content | ReactNode | - |  |
 | locale | The i18n text including empty text | object | {emptyText: `No Data`} |  |
 | pagination | Pagination [config](/components/pagination/), hide it by setting it to false | boolean \| object | false |  |
@@ -1528,7 +1528,7 @@ More about pagination, please check [`Pagination`](/components/pagination/).
 
 ### Usage upgrade after 5.1.0
 
-<Alert message="After version 5.1.0, we provide a simpler usage &lt;Mentions options={[...]} /&gt;  with better performance and potential of writing simpler code style in your applications. Meanwhile, we deprecated the old usage in browser console, we will remove it in antd 6.0."></Alert>
+<Alert message="After version 5.1.0, we provide a simpler usage &lt;Mentions options={[...]} /&gt;  with better performance and potential of writing simpler code style in your applications. Meanwhile, we deprecated the old usage in browser console, we will remove it in @private-basic-components 6.0."></Alert>
 
 ```jsx
 // works when >=5.1.0, recommended ✅
@@ -1594,7 +1594,7 @@ return (
 
     The documentation for the Menu basic UI components
     <when-to-use>
-    Navigation is an important part of any website, as a good navigation setup allows users to move around the site quickly and efficiently. Ant Design offers two navigation options: top and side. Top navigation provides all the categories and functions of the website. Side navigation provides the multi-level structure of the website.
+    Navigation is an important part of any website, as a good navigation setup allows users to move around the site quickly and efficiently. @private-basic-components offers two navigation options: top and side. Top navigation provides all the categories and functions of the website. Side navigation provides the multi-level structure of the website.
 
 More layouts with navigation: [Layout](/components/layout).
     </when-to-use>
@@ -2169,7 +2169,7 @@ Properties that shared by all types.
     <API>
     Common props ref：[Common props](/docs/react/common-props)
 
-> This component is available since `antd@5.1.0`
+> This component is available since `@private-basic-components@5.1.0`
 
 | Property | Description | Type | Default | Version |
 | :-- | :-- | :-- | :-- | :-- |
@@ -2285,7 +2285,7 @@ Radio group can wrap a group of `Radio`。
     <API>
     Common props ref：[Common props](/docs/react/common-props)
 
-> This component is available since `antd@4.20.0`
+> This component is available since `@private-basic-components@4.20.0`
 
 | Property | Description | Type | Default | Version |
 | --- | --- | --- | --- | --- |
@@ -2341,7 +2341,7 @@ Radio group can wrap a group of `Radio`。
 | notFoundContent | Specify content to show when no result matches | ReactNode | `Not Found` |  |
 | open | Controlled open state of dropdown | boolean | - |  |
 | optionFilterProp | Which prop value of option will be used for filter if filterOption is true. If `options` is set, it should be set to `label` | string | `value` |  |
-| optionLabelProp | Which prop value of option will render as content of select. [Example](https://codesandbox.io/s/antd-reproduction-template-tk678) | string | `children` |  |
+| optionLabelProp | Which prop value of option will render as content of select. [Example](https://codesandbox.io/s/@private-basic-components-reproduction-template-tk678) | string | `children` |  |
 | options | Select options. Will get better perf than jsx definition | { label, value }\[] | - |  |
 | placeholder | Placeholder of select | ReactNode | - |  |
 | placement | The position where the selection box pops up | `bottomLeft` `bottomRight` `topLeft` `topRight` | bottomLeft |  |
@@ -2517,7 +2517,7 @@ Radio group can wrap a group of `Radio`。
     The documentation for the Space basic UI components
     <when-to-use>
     - Avoid components clinging together and set a unified space.
-- Use Space.Compact when child form components are compactly connected and the border is collapsed (After version `antd@4.24.0` Supported).
+- Use Space.Compact when child form components are compactly connected and the border is collapsed (After version `@private-basic-components@4.24.0` Supported).
     </when-to-use>
 
     <API>
@@ -2732,7 +2732,7 @@ A single step in the step bar.
 | footer | Table footer renderer | function(currentPageData) | - |  |
 | getPopupContainer | The render container of dropdowns in table | (triggerNode) => HTMLElement | () => TableHtmlElement |  |
 | loading | Loading status of table | boolean \| [Spin Props](/components/spin/#api) | false |  |
-| locale | The i18n text including filter, sort, empty text, etc | object | [Default Value](https://github.com/ant-design/ant-design/blob/6dae4a7e18ad1ba193aedd5ab6867e1d823e2aa4/components/locale/en_US.tsx#L19-L37) |  |
+| locale | The i18n text including filter, sort, empty text, etc | object | [Default Value](https://github.com/@private-basic-components/@private-basic-components/blob/6dae4a7e18ad1ba193aedd5ab6867e1d823e2aa4/components/locale/en_US.tsx#L19-L37) |  |
 | pagination | Config of pagination. You can ref table pagination [config](#pagination) or full [`pagination`](/components/pagination/) document, hide it by setting it to `false` | object \| `false` | - |  |
 | rowClassName | Row's className | function(record, index): string | - |  |
 | rowKey | Row's unique key, could be a string or function that returns a string | string \| function(record): string | `key` |  |
@@ -2788,7 +2788,7 @@ One of the Table `columns` prop for describing the table's columns, Column has t
 | filterResetToDefaultFilteredValue | click the reset button, whether to restore the default filter | boolean | false |  |
 | defaultSortOrder | Default order of sorted values | `ascend` \| `descend` | - |  |
 | ellipsis | The ellipsis cell content, not working with sorter and filters for now.<br />tableLayout would be `fixed` when `ellipsis` is `true` or `{ showTitle?: boolean }` | boolean \| {showTitle?: boolean } | false | showTitle: 4.3.0 |
-| filterDropdown | Customized filter overlay | ReactNode \| (props: [FilterDropdownProps](https://github.com/ant-design/ant-design/blob/ecc54dda839619e921c0ace530408871f0281c2a/components/table/interface.tsx#L79)) => ReactNode | - |  |
+| filterDropdown | Customized filter overlay | ReactNode \| (props: [FilterDropdownProps](https://github.com/@private-basic-components/@private-basic-components/blob/ecc54dda839619e921c0ace530408871f0281c2a/components/table/interface.tsx#L79)) => ReactNode | - |  |
 | filterDropdownOpen | Whether `filterDropdown` is visible | boolean | - |  |
 | filtered | Whether the `dataSource` is filtered | boolean | false |  |
 | filteredValue | Controlled filtered value, filter icon will highlight | string\[] | - |  |
@@ -2800,7 +2800,7 @@ One of the Table `columns` prop for describing the table's columns, Column has t
 | fixed | (IE not support) Set column to be fixed: `true`(same as left) `'left'` `'right'` | boolean \| string | false |  |
 | key | Unique key of this column, you can ignore this prop if you've set a unique `dataIndex` | string | - |  |
 | render | Renderer of the table cell. The return value should be a ReactNode | function(text, record, index) {} | - |  |
-| responsive | The list of breakpoints at which to display this column. Always visible if not set | [Breakpoint](https://github.com/ant-design/ant-design/blob/015109b42b85c63146371b4e32b883cf97b088e8/components/_util/responsiveObserve.ts#L1)\[] | - | 4.2.0 |
+| responsive | The list of breakpoints at which to display this column. Always visible if not set | [Breakpoint](https://github.com/@private-basic-components/@private-basic-components/blob/015109b42b85c63146371b4e32b883cf97b088e8/components/_util/responsiveObserve.ts#L1)\[] | - | 4.2.0 |
 | rowScope | Set scope attribute for all cells in this column | `row` \| `rowgroup` | - | 5.1.0 |
 | shouldCellUpdate | Control cell render logic | (record, prevRecord) => boolean | - | 4.3.0 |
 | showSorterTooltip | If header show next sorter direction tooltip, override `showSorterTooltip` in table | boolean \| [Tooltip props](/components/tooltip/) | true |  |
@@ -2809,7 +2809,7 @@ One of the Table `columns` prop for describing the table's columns, Column has t
 | sortOrder | Order of sorted values: `ascend` `descend` `null` | `ascend` \| `descend` \| null | - |  |
 | sortIcon | Customized sort icon | (props: { sortOrder }) => ReactNode | - | 5.6.0 |
 | title | Title of this column | ReactNode \| ({ sortOrder, sortColumn, filters }) => ReactNode | - |  |
-| width | Width of this column ([width not working?](https://github.com/ant-design/ant-design/issues/13825#issuecomment-449889241)) | string \| number | - |  |
+| width | Width of this column ([width not working?](https://github.com/@private-basic-components/@private-basic-components/issues/13825#issuecomment-449889241)) | string \| number | - |  |
 | onCell | Set props on per cell | function(record, rowIndex) | - |  |
 | onFilter | Function that determines if the row is displayed when filtered | function(value, record) => boolean | - |  |
 | onFilterDropdownOpenChange | Callback executed when `filterDropdownOpen` is changed | function(visible) {} | - |  |
@@ -2900,7 +2900,7 @@ Properties for row selection.
 
     The documentation for the Tabs basic UI components
     <when-to-use>
-    Ant Design has 3 types of Tabs for different situations.
+    @private-basic-components has 3 types of Tabs for different situations.
 
 - Card Tabs: for managing too many closeable views.
 - Normal Tabs: for functional aspects of a page.
@@ -3055,7 +3055,7 @@ type DisabledTime = (now: Dayjs) => {
     - When a series of information needs to be ordered by time (ascending or descending).
 - When you need a timeline to make a visual connection.
 
-<Alert message="After version 5.2.0, we provide a simpler usage &lt;Timeline items={[...]} /&gt; with better performance and potential of writing simpler code style in your applications. Meanwhile, we deprecated the old usage in browser console, we will remove it in antd 6.0."></Alert>
+<Alert message="After version 5.2.0, we provide a simpler usage &lt;Timeline items={[...]} /&gt; with better performance and potential of writing simpler code style in your applications. Meanwhile, we deprecated the old usage in browser console, we will remove it in @private-basic-components 6.0."></Alert>
 
 ```jsx
 // works when >=5.2.0, recommended ✅
@@ -3203,7 +3203,7 @@ One or more elements can be selected from either column, one click on the proper
 
 | Property | Description | Type | Default | Version |
 | --- | --- | --- | --- | --- |
-| dataSource | Used for setting the source data. The elements that are part of this array will be present the left column. Except the elements whose keys are included in `targetKeys` prop | [RecordType extends TransferItem = TransferItem](https://github.com/ant-design/ant-design/blob/1bf0bab2a7bc0a774119f501806e3e0e3a6ba283/components/transfer/index.tsx#L12)\[] | \[] |  |
+| dataSource | Used for setting the source data. The elements that are part of this array will be present the left column. Except the elements whose keys are included in `targetKeys` prop | [RecordType extends TransferItem = TransferItem](https://github.com/@private-basic-components/@private-basic-components/blob/1bf0bab2a7bc0a774119f501806e3e0e3a6ba283/components/transfer/index.tsx#L12)\[] | \[] |  |
 | disabled | Whether disabled transfer | boolean | false |  |
 | selectionsIcon | custom dropdown icon | React.ReactNode |  | 5.8.0 |
 | filterOption | A function to determine whether an item should show in search result list, only works when searching, (add `direction` support since 5.9.0+) | (inputValue, option, direction: `left` \| `right`): boolean | - |  |
@@ -3571,10 +3571,10 @@ Transfer accept `children` to customize render list, using follow props:
 | defaultFileList | Default list of files that have been uploaded | object\[] | - |  |
 | directory | Support upload whole directory ([caniuse](https://caniuse.com/#feat=input-file-directory)) | boolean | false |  |
 | disabled | Disable upload button | boolean | false |  |
-| fileList | List of files that have been uploaded (controlled). Here is a common issue [#2423](https://github.com/ant-design/ant-design/issues/2423) when using it | [UploadFile](#uploadfile)\[] | - |  |
+| fileList | List of files that have been uploaded (controlled). Here is a common issue [#2423](https://github.com/@private-basic-components/@private-basic-components/issues/2423) when using it | [UploadFile](#uploadfile)\[] | - |  |
 | headers | Set request headers, valid above IE10 | object | - |  |
 | iconRender | Custom show icon | (file: UploadFile, listType?: UploadListType) => ReactNode | - |  |
-| isImageUrl | Customize if render &lt;img /> in thumbnail | (file: UploadFile) => boolean | [(inside implementation)](https://github.com/ant-design/ant-design/blob/4ad5830eecfb87471cd8ac588c5d992862b70770/components/upload/utils.tsx#L47-L68) |  |
+| isImageUrl | Customize if render &lt;img /> in thumbnail | (file: UploadFile) => boolean | [(inside implementation)](https://github.com/@private-basic-components/@private-basic-components/blob/4ad5830eecfb87471cd8ac588c5d992862b70770/components/upload/utils.tsx#L47-L68) |  |
 | itemRender | Custom item of uploadList | (originNode: ReactElement, file: UploadFile, fileList: object\[], actions: { download: function, preview: function, remove: function }) => React.ReactNode | - | 4.16.0 |
 | listType | Built-in stylesheets, support for four types: `text`, `picture`, `picture-card` or `picture-circle` | string | `text` | `picture-circle`(5.2.0+) |
 | maxCount | Limit the number of uploaded files. Will replace current one when `maxCount` is `1` | number | - | 4.10.0 |

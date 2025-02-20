@@ -17,8 +17,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'FigAgent',
-  description: 'AI友好的整洁业务组件模板'
+  title: 'private-component-codegen',
+  description: '基于私有组件的生成业务组件代码的 AI RAG 应用'
 };
 
 export default function RootLayout({
